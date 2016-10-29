@@ -53,6 +53,9 @@ Install:
 		6. If something in one of the steps is not working you may find help over elasticsearch website and 
 		the hebrew plugin github repository.
 	
+
+	run:
+
 	open-budget-search-api part:
 		
 		1. Run init_db.py - This will load all of the tables that are under data/ directory
@@ -62,7 +65,7 @@ Install:
 		2. Run main.py -  This module start listening to requests of the following structure:
 		http://localhost:8888/search/comma_seperated_table_names/search_term/from_data/to_date/maxinum_size_of_result/offset
 		for example
-		http://localhost:8888/search/change_history/test/2000-01-01/2019-01-01/4/0
+		http://localhost:8888/search/exemption/test/2000-01-01/2019-01-01/4/0
 		3. There is a log for exceptions called obudget.log which is written right next to the main.py and/or init_db
 		
 		
