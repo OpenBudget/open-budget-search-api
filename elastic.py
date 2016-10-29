@@ -42,7 +42,7 @@ def get_type_definition(type):
 
 def is_real_type(type_):
     for definition in TYPES_DATA:
-        if definition["type_name"] == type:
+        if definition["type_name"] == type_:
             return True
     return False
 
@@ -157,7 +157,7 @@ def search(types, term, from_date, to_date, size, offset):
         ret_val[type] = {}
 
         if type != "entities":
-            ret_val[type]["total_in_time_range"] = len(elastic_result[type]["aggregations"]["filtered"]["top_results"]["hits"]["hits"])
+            ret_val[type]["total_in_result"] = len(elastic_result[type]["aggregations"]["filtered"]["top_results"]["hits"]["hits"])
             ret_val[type]["data_time_distribution"] = elastic_result[type]["aggregations"]["stats_per_month"]["buckets"]
 
         ret_val[type]["total_overall"] = elastic_result[type]["hits"]["total"]
