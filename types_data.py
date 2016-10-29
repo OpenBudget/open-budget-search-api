@@ -228,10 +228,10 @@ TYPES_DATA = [
                     'type': 'long'
                 },
                 'personnel_allocated': {
-                    'type': 'long'
+                    'type': 'double'
                 },
                 'personnel_revised': {
-                    'type': 'long'
+                    'type': 'double'
                 },
                 'commitment_allocated': {
                     'type': 'long'

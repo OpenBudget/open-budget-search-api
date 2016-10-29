@@ -1,7 +1,7 @@
 import elastic
+from elastic import logger
 import tornado.ioloop
 import tornado.web
-
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
@@ -16,7 +16,12 @@ class IndexDocumentHandler(tornado.web.RequestHandler):
 class SearchHandler(tornado.web.RequestHandler):
     def get(self, types, search_term, from_date, to_date, size, offset):
         types_formatted = str(types).split(",")
-        result = elastic.search(types_formatted, search_term, from_date, to_date, size, offset)
+        result = {}
+        try:
+            result = elastic.search(types_formatted, search_term, from_date, to_date, size, offset)
+        except Exception as e:
+            self.write(str(e))
+            logger.exception("Error searching %s for tables: %s " % (search_term, str(types)))
         self.write(result)
 
 

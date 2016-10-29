@@ -4,6 +4,8 @@ import re
 import datetime
 from types_data import TYPES_DATA
 
+
+
 INDEX_NAME = 'obudget'
 logger = logging.getLogger('obudget')
 hdlr = logging.FileHandler('obudget.log')
@@ -37,6 +39,12 @@ def get_type_definition(type):
     for definition in TYPES_DATA:
         if definition["type_name"] == type:
             return definition
+
+def is_real_type(type_):
+    for definition in TYPES_DATA:
+        if definition["type_name"] == type:
+            return True
+    return False
 
 def preperare_typed_query(type,term, from_date, to_date, search_size, offset):
       type_definition = get_type_definition(type)
@@ -142,6 +150,8 @@ def search(types, term, from_date, to_date, size, offset):
     elastic_result = {}
     ret_val = {}
     for type in types:
+        if is_real_type(type) is False:
+            return {"message": "not a real type"}
         query_body = preperare_typed_query(type, term,from_date, to_date, size, offset)
         elastic_result[type] = es.search(index="obudget", body=query_body)
         ret_val[type] = {}
@@ -153,7 +163,7 @@ def search(types, term, from_date, to_date, size, offset):
         ret_val[type]["total_overall"] = elastic_result[type]["hits"]["total"]
         ret_val[type]["docs"] = {}
 
-        if
+
         for i, doc in enumerate(elastic_result[type]["aggregations"]["filtered"]["top_results"]["hits"]["hits"]):
             ret_val[type]["docs"][i] = {}
             ret_val[type]["docs"][i]["source"] = doc["_source"]
