@@ -1,0 +1,123 @@
+=====================================================
+
+work with plugin
+
+XPOST _search
+{
+
+    "query" : {
+        "query_string": {
+
+           "fields": [
+              "supplier"
+           ], 
+           "query": "שפיצחה" 
+        }
+    }
+}
+
+=====================================================
+
+
+XPOST _search
+{
+   "query": {
+      "query_string": {
+         "query": "לא"
+      }
+   }
+}
+
+
+XPOST _search
+{
+    "query" : {
+        "term" : { "page_title" : "ללא" }
+    }
+}
+
+
+
+
+XPOST _search
+{   
+    "size": 200,
+    "query" : {
+        "match_all" : {}
+    }
+}
+
+
+
+XPOST _search
+{
+
+    "query" : {
+        "term" : { "page_title" : "אלון" }
+        
+    }
+}
+
+XPOST _search
+{
+    "query" : {
+        "query_string": {
+           "analyzer": "hebrew",
+           "fields": [
+              "user"
+           ], 
+           "query": "משתמש" 
+        }
+    }
+}
+
+
+
+
+XPOST _search
+{
+    "query" : {
+        "query_string": {
+           "analyzer": "hebrew",
+           "fields": [
+              "page_title"
+           ], 
+           "query": "לא" 
+        }
+    }
+}
+
+
+
+
+
+
+XPOST _search
+{
+
+    "query" : {
+        "query_string": {
+
+           "fields": [
+              "supplier"
+           ], 
+           "query": "ישוב" 
+        }
+    }
+}
+
+
+
+
+XPOST _search
+{
+    "query" : {
+        "query_string": {
+
+           "fields": [
+              "description"
+           ], 
+           "query": "ענייני"   
+           }
+    }
+}

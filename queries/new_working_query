@@ -1,0 +1,62 @@
+
+POST /obudget/_search
+{
+    "query": {
+        "filtered": {
+            "query": {
+                "query_string": {
+                          "fields": ["budget.title","budget.req_title", "budget.change_title", "budget.change_type_name", "budget.budget_title", "budget.pending", "budget.properties","exemptions.publisher", "exemptions.regulation", "exemptions.supplier", "exemptions.contact", "exemptions.contact_email", "exemptions.description", "exemptions.reason", "exemptions.decision", "exemptions.url", "exemptions.subjects", "exemptions.source_currency", "exemptions.page_title", "exemptions.entity_kind"],
+            "query": "הוצאות"
+                }
+            }
+        }
+    },
+  "aggs": {
+    "filtered": {
+      "filter": {
+        "bool": {
+          "must": [
+            {
+              "type": {
+                "value": "exemptions"
+              }
+            },
+            {
+              "range": {
+                    "start_date": {
+                        "gte": "2011-01-01"
+                    },
+                    "end_date": {
+                        "lte": "2021-01-01"
+                    }
+                }
+            }
+          ]
+        }
+      },
+    "aggs": {
+        "exemptions_top_results": {
+            "top_hits": {
+                "size": 3,
+                "highlight" : {
+                    "fields": {
+                        "*": {}
+                    }
+                },
+                "sort": [
+                            {
+                                "start_date": {
+                                    "order": "desc"
+                                }
+                            }
+                        ]
+            }
+        }
+    }
+}
+	}
+}
+  },
+  "size": 0
+}
+
