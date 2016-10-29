@@ -30,7 +30,6 @@ Install:
 		the hebrew plugin github repository.
 
 
-
 		On Linux:
 
 		1. Download latest elasticsearch version
@@ -57,9 +56,14 @@ Install:
 	open-budget-search-api part:
 		
 		1. Run init_db.py - This will load all of the tables that are under data/ directory
+		The following tables are to be expected to be there:
+			exemption, budget, supports, changes, type_name (change_history can also be put there). There rest
+			of the tables will be ignored
 		2. Run main.py -  This module start listening to requests of the following structure:
 		http://localhost:8888/search/comma_seperated_table_names/search_term/from_data/to_date/maxinum_size_of_result/offset
 		for example
+		3. There is a log for exceptions called obudget.log which is written right next to the main.py and/or init_db
+		
 		
 		
 	
