@@ -3,6 +3,7 @@ from types_data import TYPES_DATA
 import json
 import os
 import csv
+import psycopg2
 
 
 def clean():
@@ -64,11 +65,25 @@ def map_tables():
     for type_obj in TYPES_DATA:
         create_mapping(type_obj["type_name"], type_obj["mapping"])
 
+def import_all_tables(tables_path, type_data):
+    for type_obj in type_data:
+        table = type_obj["type_name"]
+        import_data(os.path.join(tables_path, table + ".csv"), table)
+
+def import_data(input_path, input_type):
+    conn = psycopg2.connect("postgresql://redash_reader:kaedusha@data.obudget.org/obudget")
+    cursor = conn.cursor()
+    cursor.execute('select * from %s' % (input_type))
+    with open(input_path, 'w', encoding="utf-8") as fout:
+        writer = csv.writer(fout)
+        writer.writerow([i[0] for i in cursor.description])  # heading row
+        writer.writerows(cursor.fetchall())
 
 def initialize_db():
     clean()
     create_index()
     map_tables()
+    import_all_tables('data', TYPES_DATA)
     load_tables('data', TYPES_DATA)
 
 

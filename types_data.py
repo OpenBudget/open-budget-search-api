@@ -589,64 +589,64 @@ TYPES_DATA = [
                         }
                     ]
     },
-    {
-        'type_name': 'change_history',
-        'search_fields': ["change_history.model", "change_history.selector", "change_history.field", "change_history.from_value", "change_history.to_value"],
-        'mapping': {
-            'properties': {
-                'model': {
-                    'type': 'string'
-                },
-                'time': {
-                    'type': 'date',
-                    'format': 'dd/MM/yy||yyyy-MM-dd'
-                },
-                'field': {
-                    'type': 'string',
-                },
-                'from_value': {
-                    'type': 'string',
-                    'analyzer': 'hebrew',
-                    'fields': {
-                        'raw': {
-                            'type': 'string',
-                            'index': 'not_analyzed'
-                        }
-                    }
-                },
-                'to_value': {
-                    'type': 'string',
-                    'analyzer': 'hebrew',
-                    'fields': {
-                        'raw': {
-                            'type': 'string',
-                            'index': 'not_analyzed'
-                        }
-                    }
-                },
-                'created': {
-                    'type': 'boolean'
-                }
-            }
-        },
-        'date_fields': {
-            'from': 'time',
-            'to': 'time'
-        },
-        "range_structure": {
-                            'time': {
-                                "gte": "from_date",
-                                "lte": "to_date"
-                            }
-                        },
-        'sort_method': [
-                        {
-                            "time": {
-                                "order": "desc"
-                            }
-                        }
-                    ]
-    },
+    # {
+    #     'type_name': 'change_history',
+    #     'search_fields': ["change_history.model", "change_history.selector", "change_history.field", "change_history.from_value", "change_history.to_value"],
+    #     'mapping': {
+    #         'properties': {
+    #             'model': {
+    #                 'type': 'string'
+    #             },
+    #             'time': {
+    #                 'type': 'date',
+    #                 'format': 'dd/MM/yy||yyyy-MM-dd'
+    #             },
+    #             'field': {
+    #                 'type': 'string',
+    #             },
+    #             'from_value': {
+    #                 'type': 'string',
+    #                 'analyzer': 'hebrew',
+    #                 'fields': {
+    #                     'raw': {
+    #                         'type': 'string',
+    #                         'index': 'not_analyzed'
+    #                     }
+    #                 }
+    #             },
+    #             'to_value': {
+    #                 'type': 'string',
+    #                 'analyzer': 'hebrew',
+    #                 'fields': {
+    #                     'raw': {
+    #                         'type': 'string',
+    #                         'index': 'not_analyzed'
+    #                     }
+    #                 }
+    #             },
+    #             'created': {
+    #                 'type': 'boolean'
+    #             }
+    #         }
+    #     },
+    #     'date_fields': {
+    #         'from': 'time',
+    #         'to': 'time'
+    #     },
+    #     "range_structure": {
+    #                         'time': {
+    #                             "gte": "from_date",
+    #                             "lte": "to_date"
+    #                         }
+    #                     },
+    #     'sort_method': [
+    #                     {
+    #                         "time": {
+    #                             "order": "desc"
+    #                         }
+    #                     }
+    #                 ]
+    # },
     {
         'type_name': 'entities',
         'search_fields': ["entities.kind", "entities.name", "entities.manpower_contractor", "entities.service_contractor", "entities.company_name", "entities.company_status", "entities.company_type", "entities.company_government", "entities.company_limit", "entities.company_government", \
