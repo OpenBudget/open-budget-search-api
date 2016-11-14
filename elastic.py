@@ -2,13 +2,14 @@ import elasticsearch
 import logging
 import re
 import datetime
+import sys
 from types_data import TYPES_DATA
 
 
 
 INDEX_NAME = 'obudget'
 logger = logging.getLogger('obudget')
-hdlr = logging.FileHandler('obudget.log')
+hdlr = logging.StreamHandler(sys.stderr)
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 hdlr.setFormatter(formatter)
 logger.addHandler(hdlr)
