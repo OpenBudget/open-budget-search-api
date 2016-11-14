@@ -22,7 +22,7 @@ Install:
 		hebrew.dict.path: C:\dev\elasticsearch-1.7.0\hspell-data-files\
 
 		5. Now start elasticsearch bin\elasticsearch.bat, and via your browser test the plugin by going to :
-		http://localhost:9200/_hebrew/check-word/áãé÷ä
+		http://localhost:9200/_hebrew/check-word/Ã¡Ã£Ã©Ã·Ã¤
 
 		If it loads, it means everything is set up and you are good to go.
 
@@ -43,10 +43,10 @@ Install:
 		4. Go to config\elasticsearch.yml and add at the buttom the following line:
 		hebrew.dict.path: FULL/PATH/TO/HSPELL-DATA-FILES
 		for example:
-		hebrew.dict.path: C:\dev\elasticsearch-1.7.0\hspell-data-files\
+		hebrew.dict.path: /tmp/hspell-data-files/
 
 		5. Now start elasticsearch bin\elasticsearch.bat, and via your browser test the plugin by going to :
-		http://localhost:9200/_hebrew/check-word/áãé÷ä
+		http://localhost:9200/_hebrew/check-word/Ã¡Ã£Ã©Ã·Ã¤
 
 		If it loads, it means everything is set up and you are good to go.
 
@@ -63,9 +63,9 @@ Install:
 			exemption, budget, supports, changes, type_name (change_history can also be put there). There rest
 			of the tables will be ignored
 		2. Run main.py -  This module start listening to requests of the following structure:
-		http://localhost:8888/search/comma_seperated_table_names/search_term/from_data/to_date/maxinum_size_of_result/offset
+		http://localhost:5000/search/comma_seperated_table_names/search_term/from_data/to_date/maxinum_size_of_result/offset
 		for example
-		http://localhost:8888/search/exemption/test/2000-01-01/2019-01-01/4/0
+		http://localhost:5000/search/exemption/test/2000-01-01/2019-01-01/4/0
 		3. There is a log for exceptions called obudget.log which is written right next to the main.py and/or init_db
 		
 		
