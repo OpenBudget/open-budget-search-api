@@ -14,6 +14,6 @@ RUN rm -rf /var/cache/apk/*
 
 USER $GUNICORN_USER
 
-ENV GUNICORN_MODULE=main:app
+ENV GUNICORN_MODULE=main
 
 EXPOSE 8000
