@@ -8,10 +8,10 @@ def main_handler():
     if request.method == 'GET':
         return "Hello, world"
 
-@app.route('/index/<string:type_name>', methods = ['POST'])
-def index_document_handler(type_name):
-    data = request.get_json()
-    elastic.index_doc(type_name, data)
+# @app.route('/index/<string:type_name>', methods = ['POST'])
+# def index_document_handler(type_name):
+#     data = request.get_json()
+#     elastic.index_doc(type_name, data)
 
 @app.route('/search/<string:types>/<string:search_term>/<string:from_date>/<string:to_date>/<string:size>/<string:offset>', methods=['GET'])
 def search_handler(types, search_term, from_date, to_date, size, offset):
