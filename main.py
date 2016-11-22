@@ -1,7 +1,10 @@
-import elastic
-from elastic import logger
 from flask import Flask, request, jsonify
+
+import elastic
+from .logger import logger
+
 app = Flask(__name__)
+
 
 @app.route('/', methods = ['GET'])
 def main_handler():
@@ -13,7 +16,9 @@ def main_handler():
 #     data = request.get_json()
 #     elastic.index_doc(type_name, data)
 
-@app.route('/search/<string:types>/<string:search_term>/<string:from_date>/<string:to_date>/<string:size>/<string:offset>', methods=['GET'])
+
+@app.route('/search/<string:types>/<string:search_term>/<string:from_date>/<string:to_date>/<string:size>/<string:offset>',
+           methods=['GET'])
 def search_handler(types, search_term, from_date, to_date, size, offset):
     types_formatted = str(types).split(",")
     try:

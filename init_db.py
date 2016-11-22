@@ -1,9 +1,10 @@
-from elastic import get_es_client, logger, INDEX_NAME
-from types_data import TYPES_DATA
 import json
-import os
-import csv
 import psycopg2
+
+from .logger import logger
+from .config import INDEX_NAME, db_connection_string
+from .elastic import get_es_client
+from .types_data import TYPES_DATA
 
 
 def clean():
@@ -29,62 +30,44 @@ def create_mapping(type, doc_body):
     es.indices.put_mapping(index=INDEX_NAME, doc_type=type, body=doc_body)
 
 
-def load_tables(tables_path, type_data):
-    #assuming table name and table type is the same- should change ?
+def load_tables(type_data):
+    # assuming table name and table type is the same- should change ?
     for type_obj in type_data:
         table = type_obj["type_name"]
-        load_data(os.path.join(tables_path, table + ".csv"), table)
+        load_data(import_data(table), table)
 
 
-def load_data(input_path, input_type):
+def load_data(it, input_type):
     es = get_es_client()
-    if (os.path.isfile(input_path)):
-        with open(input_path, 'r', encoding="utf-8") as input_file:
-            csv_reader = csv.reader(input_file)
-            # Parse headers.
-            fields_list = []
-            headers = next(csv_reader)
-            for header in headers:
-                fields_list.append(header.lower())
-            for idx, row in enumerate(csv_reader):
-                document = {}
-                for cell, field_name in zip(row, fields_list):
-                    cell = cell.strip()
-                    if cell:
-                        document[field_name] = cell
-                if idx % 100 == 0:
-                    print(idx)
-                try:
-                    es.index(INDEX_NAME, input_type, document)
-                except Exception as e:
-                    print("exception in line: " + str(idx))
-                    logger.exception("Error indexing INDEX_NAME: %s, input_type: %s, document: %s" % (INDEX_NAME, input_type, json.dumps(document)))
+    for idx, document in enumerate(it):
+        if idx % 100 == 0:
+            logger.debug("%s: loaded %d rows", input_type, idx)
+        try:
+            es.index(INDEX_NAME, input_type, document)
+        except Exception as e:
+            logger.exception("exception in line: " + str(idx))
+            logger.error("Error indexing INDEX_NAME: %s, input_type: %s, document: %s" % (INDEX_NAME, input_type, json.dumps(document)))
 
 
 def map_tables():
     for type_obj in TYPES_DATA:
         create_mapping(type_obj["type_name"], type_obj["mapping"])
 
-def import_all_tables(tables_path, type_data):
-    for type_obj in type_data:
-        table = type_obj["type_name"]
-        import_data(os.path.join(tables_path, table + ".csv"), table)
 
-def import_data(input_path, input_type):
-    conn = psycopg2.connect("postgresql://redash_reader:kaedusha@data.obudget.org/obudget")
+def import_data(input_type):
+    conn = psycopg2.connect(db_connection_string)
     cursor = conn.cursor()
-    cursor.execute('select * from %s' % (input_type))
-    with open(input_path, 'w', encoding="utf-8") as fout:
-        writer = csv.writer(fout)
-        writer.writerow([i[0] for i in cursor.description])  # heading row
-        writer.writerows(cursor.fetchall())
+    cursor.execute('select * from %s' % input_type)
+    headers = [i[0] for i in cursor.description]
+    for row in cursor.fetchall():
+        yield dict(zip(headers, row))
+
 
 def initialize_db():
     clean()
     create_index()
     map_tables()
-    import_all_tables('data', TYPES_DATA)
-    load_tables('data', TYPES_DATA)
+    load_tables(TYPES_DATA)
 
 
 if __name__ == "__main__":
