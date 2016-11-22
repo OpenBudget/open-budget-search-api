@@ -1,10 +1,17 @@
-import elasticsearch
+import json
 import re
-from types_data import TYPES_DATA
-from config import INDEX_NAME, ES_SERVERS_LIST, DEFAULT_TIMEOUT
+import elasticsearch
 
-# EXEMPTION_SEARCH_FIELD_LIST = ["exemptions.publisher", "exemptions.regulation", "exemptions.supplier", "exemptions.contact", "exemptions.contact_email", "exemptions.description", "exemptions.reason", "exemptions.decision", "exemptions.url", "exemptions.subjects", "exemptions.source_currency", "exemptions.page_title", "exemptions.entity_kind"]
-# BUDGET_SEARCH_FIELD_LIST = ["budget.title","budget.req_title", "budget.change_title", "budget.change_type_name", "budget.budget_title", "budget.pending", "budget.properties"]
+from .types_data import TYPES_DATA
+from .config import INDEX_NAME, ES_SERVERS_LIST, DEFAULT_TIMEOUT
+from .logger import logger
+
+# EXEMPTION_SEARCH_FIELD_LIST = ["exemptions.publisher", "exemptions.regulation", "exemptions.supplier",\
+#  "exemptions.contact", "exemptions.contact_email", "exemptions.description", "exemptions.reason",\
+#  "exemptions.decision", "exemptions.url", "exemptions.subjects", "exemptions.source_currency",\
+#  "exemptions.page_title", "exemptions.entity_kind"]
+# BUDGET_SEARCH_FIELD_LIST = ["budget.title","budget.req_title", "budget.change_title", "budget.change_type_name",\
+#  "budget.budget_title", "budget.pending", "budget.properties"]
 
 
 def get_es_client():
@@ -134,6 +141,7 @@ def search(types, term, from_date, to_date, size, offset):
         if is_real_type(type) is False:
             return {"message": "not a real type"}
         query_body = preperare_typed_query(type, term,from_date, to_date, size, offset)
+        logger.info('Running QUERY:\n%s', json.dumps(query_body, indent=2, sort_keys=True))
         elastic_result[type] = es.search(index="obudget", body=query_body)
         ret_val[type] = {}
 

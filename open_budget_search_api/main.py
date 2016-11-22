@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 
-import elastic
+from .elastic import search
 from .logger import logger
 
 app = Flask(__name__)
@@ -22,7 +22,7 @@ def main_handler():
 def search_handler(types, search_term, from_date, to_date, size, offset):
     types_formatted = str(types).split(",")
     try:
-        result = elastic.search(types_formatted, search_term, from_date, to_date, size, offset)
+        result = search(types_formatted, search_term, from_date, to_date, size, offset)
     except Exception as e:
         logger.exception("Error searching %s for tables: %s " % (search_term, str(types)))
         return str(e)

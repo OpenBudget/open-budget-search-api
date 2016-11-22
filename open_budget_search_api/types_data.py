@@ -146,7 +146,7 @@ TYPES_DATA = [
                     }
                 },
                 'entity_id': {
-                    'type': 'long'
+                    'type': 'string'
                 },
                 'entity_kind': {
                     'type': 'string',
@@ -257,21 +257,6 @@ TYPES_DATA = [
                 'dedicated_revised': {
                     'type': 'long'
                 },
-                'contractors_allocated': {
-                    'type': 'long'
-                },
-                'contractors_allocated': {
-                    'type': 'long'
-                },
-                'contractors_allocated': {
-                    'type': 'long'
-                },
-                'contractors_allocated': {
-                    'type': 'long'
-                },
-                'contractors_allocated': {
-                    'type': 'long'
-                },
                 'equiv_code': {
                     'type': 'string',
                     'analyzer': 'hebrew'
@@ -297,16 +282,6 @@ TYPES_DATA = [
                     }
                 },
                 'class_full': {
-                    'type': 'string',
-                    'analyzer': 'hebrew',
-                    'fields': {
-                        'raw': {
-                            'type': 'string',
-                            'index': 'not_analyzed'
-                        }
-                    }
-                },
-                'group_top': {
                     'type': 'string',
                     'analyzer': 'hebrew',
                     'fields': {
@@ -348,7 +323,15 @@ TYPES_DATA = [
                 }
             }
         },
-        'search_fields': ["budget.title","budget.req_title", "budget.change_title", "budget.change_type_name", "budget.budget_title", "budget.pending", "budget.properties"],
+        'search_fields': ["budget.title",
+                          "budget.code",
+                          "budget.kind",
+                          "budget.subkind",
+                          "budget.group_top",
+                          "budget.group_full",
+                          "budget.class_top",
+                          "budget.class_full",
+                          "budget.properties"],
         'date_fields': {
             'from': 'year',
             'to': 'year'
@@ -482,7 +465,6 @@ TYPES_DATA = [
             'properties': {
                 'year': {
                     'type': 'date',
-                    'format': 'date'
                 },
                 'leading_item': {
                     'type': 'long'
@@ -657,8 +639,15 @@ TYPES_DATA = [
                     'type': 'long'
                 },
                 'kind': {
-                    'type': 'string'
-                },
+                    'type': 'string',
+                    'analyzer': 'hebrew',
+                    'fields': {
+                        'raw': {
+                            'type': 'string',
+                            'index': 'not_analyzed'
+                        }
+                    }
+               },
                 'name': {
                     'type': 'string',
                     'analyzer': 'hebrew',
@@ -766,6 +755,16 @@ TYPES_DATA = [
                     }
                 },
                 'company_city': {
+                    'type': 'string',
+                    'analyzer': 'hebrew',
+                    'fields': {
+                        'raw': {
+                            'type': 'string',
+                            'index': 'not_analyzed'
+                        }
+                    }
+                },
+                'company_ceo': {
                     'type': 'string',
                     'analyzer': 'hebrew',
                     'fields': {
