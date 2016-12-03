@@ -801,3 +801,12 @@ TYPES_DATA = [
                     ]
     }
 ]
+
+
+KEYS = {
+    'budget': ['year', 'code'],
+    'exemption': ['publication_id'],
+    'supports': ['year', 'code', 'recipient', 'kind'],
+    'changes': ['year', 'leading_item', 'req_code', 'budget_code'],
+    'entities': ['id'],
+}
