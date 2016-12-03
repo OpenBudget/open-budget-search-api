@@ -41,10 +41,14 @@ def is_real_type(type_):
     return False
 
 
+def temporal_type(type_):
+    return type_ != 'entities'
+
+
 def preperare_typed_query(type, term, from_date, to_date, search_size, offset):
     type_definition = get_type_definition(type)
-    body= {
-              "query": {
+    body = {
+                "query": {
                     "filtered": {
                         "query": {
                             "query_string": {
@@ -54,53 +58,50 @@ def preperare_typed_query(type, term, from_date, to_date, search_size, offset):
                         }
                     }
                 },
-              "aggs": {
-                  "stats_per_month":{
-                      "date_histogram":{
-                          "field": type_definition["type_name"] + "." + type_definition['date_fields']['from'],
-                          "interval": "month"
-                     }
-                   },
-                  "filtered": {
-                    "filter": {
-                      "bool": {
-                        "must": [
-                          {
-                            "type": {
-                              "value": type
-                            }
-                          },
-                          {
-                            "range": type_definition['range_structure']
+                "aggs": {
+                    "stats_per_month": {
+                          "date_histogram": {
+                              "field": type_definition["type_name"] + "." + type_definition['date_fields']['from'],
+                              "interval": "month"
                           }
-                        ]
-                      }
                     },
-                    "aggs": {
-                      "top_results": {
-                         "top_hits": {
-                            "size": int(search_size),
-                            "from": int(offset),
-                            "highlight": {
-                                "fields": {
-                                    "*": {}
+                    "filtered": {
+                        "filter": {
+                            "bool": {
+                                "must": [
+                                    {
+                                        "type": {
+                                            "value": type
+                                        }
+                                    }, {
+                                        "range": type_definition['range_structure']
+                                    }
+                                ]
+                            }
+                        },
+                        "aggs": {
+                            "top_results": {
+                                "top_hits": {
+                                    "size": int(search_size),
+                                    "from": int(offset),
+                                    "highlight": {
+                                        "fields": {
+                                            "*": {}
+                                        }
+                                    },
+                                    "sort": type_definition['sort_method']
                                 }
-                            },
-                            "sort": type_definition['sort_method']
-                         }
-                      }
+                            }
+                        }
                     }
-                  }
-              },
-              "size": 0
+                },
+                "size": 0
     }
 
-    range_obj = body["aggs"]["filtered"]["filter"]["bool"]["must"][1]["range"]
-    if type == "entities":
-        body["aggs"]["filtered"]["filter"]["bool"]["must"].remove(body["aggs"]["filtered"]["filter"]["bool"]["must"][1])
-    elif type == "exepmtion":
-        range_obj[type_definition['date_fields']['from']]["gte"] = from_date
-        range_obj[type_definition['date_fields']['to']]["lte"] = to_date
+    must = body["aggs"]["filtered"]["filter"]["bool"]["must"]
+    range_obj = must[1]["range"]
+    if temporal_type(type):
+        must.remove(body["aggs"]["filtered"]["filter"]["bool"]["must"][1])
     else:
         range_obj[type_definition['date_fields']['from']]["gte"] = from_date
         range_obj[type_definition['date_fields']['to']]["lte"] = to_date
@@ -116,7 +117,7 @@ def parse_highlights(highlights):
         for term in highlights[field]:
             start_tag_results = re.finditer(start_tag, term)
             end_tag_results = re.finditer(end_tag, term)
-            for start, end in zip(start_tag_results,end_tag_results):
+            for start, end in zip(start_tag_results, end_tag_results):
                     result_index = start.end() - len(start_tag)
                     result_len = end.start() - start.end()
                     parsed_highlights[field].append([result_index, result_len])
@@ -140,22 +141,23 @@ def search(types, term, from_date, to_date, size, offset):
     for type in types:
         if is_real_type(type) is False:
             return {"message": "not a real type"}
-        query_body = preperare_typed_query(type, term,from_date, to_date, size, offset)
+        query_body = preperare_typed_query(type, term, from_date, to_date, size, offset)
         logger.info('Running QUERY:\n%s', json.dumps(query_body, indent=2, sort_keys=True))
-        elastic_result[type] = es.search(index="obudget", body=query_body)
+        elastic_result[type] = es.search(index=INDEX_NAME,
+                                         body=query_body)
         ret_val[type] = {}
 
-        if type != "entities":
+        if temporal_type(type):
             ret_val[type]["total_in_result"] = len(elastic_result[type]["aggregations"]["filtered"]["top_results"]["hits"]["hits"])
             ret_val[type]["data_time_distribution"] = elastic_result[type]["aggregations"]["stats_per_month"]["buckets"]
 
         ret_val[type]["total_overall"] = elastic_result[type]["hits"]["total"]
-        ret_val[type]["docs"] = {}
+        ret_val[type]["docs"] = []
 
-        for i, doc in enumerate(elastic_result[type]["aggregations"]["filtered"]["top_results"]["hits"]["hits"]):
-            ret_val[type]["docs"][i] = {}
-            ret_val[type]["docs"][i]["source"] = doc["_source"]
-            ret_val[type]["docs"][i]["highlight"] = parse_highlights(doc["highlight"])
+        for doc in elastic_result[type]["aggregations"]["filtered"]["top_results"]["hits"]["hits"]:
+            rec = {'source': doc["_source"],
+                   'highlight': parse_highlights(doc["highlight"])}
+            ret_val[type]["docs"].append(rec)
 
     return ret_val
 

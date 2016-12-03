@@ -78,6 +78,7 @@ def import_data(input_type):
         headers = [i[0] for i in cursor.description]
         for row in cursor:
             yield dict(zip(headers, row))
+
     except:
         logger.exception("exception while loading data for %s", input_type)
 

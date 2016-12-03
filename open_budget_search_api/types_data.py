@@ -159,7 +159,19 @@ TYPES_DATA = [
                 }
             }
         },
-        'search_fields': ["exemption.publisher", "exemption.regulation", "exemption.supplier", "exemption.contact", "exemption.contact_email", "exemption.description", "exemption.reason", "exemption.decision", "exemption.url", "exemption.subjects", "exemption.source_currency", "exemption.page_title", "exemption.entity_kind"],
+        'search_fields': ["publisher",
+                          "regulation",
+                          "supplier",
+                          "contact",
+                          "contact_email",
+                          "description",
+                          "reason",
+                          "decision",
+                          "url",
+                          "subjects",
+                          "source_currency",
+                          "page_title",
+                          "entity_kind"],
         'date_fields': {
             'from' : 'start_date',
             'to': 'end_date'
@@ -323,15 +335,15 @@ TYPES_DATA = [
                 }
             }
         },
-        'search_fields': ["budget.title",
-                          "budget.code",
-                          "budget.kind",
-                          "budget.subkind",
-                          "budget.group_top",
-                          "budget.group_full",
-                          "budget.class_top",
-                          "budget.class_full",
-                          "budget.properties"],
+        'search_fields': ["title",
+                          "code",
+                          "kind",
+                          "subkind",
+                          "group_top",
+                          "group_full",
+                          "class_top",
+                          "class_full",
+                          "properties"],
         'date_fields': {
             'from': 'year',
             'to': 'year'
@@ -357,7 +369,13 @@ TYPES_DATA = [
     },
     {
         'type_name': 'supports',
-        'search_fields': ["supports.subject", "supports.code", "supports.recipient", "supports.kind", "supports.title", "supports.entity_id", "supports.entity_kind"],
+        'search_fields': ["subject",
+                          "code",
+                          "recipient",
+                          "kind",
+                          "title",
+                          "entity_id",
+                          "entity_kind"],
         'mapping': {
             'properties': {
                 'year': {
@@ -460,7 +478,11 @@ TYPES_DATA = [
     },
     {
         'type_name': 'changes',
-        'search_fields': ["changes.req_title", "changes.change_title", "changes.change_type_name", "changes.budget_code", "changes.budget_title"],
+        'search_fields': ["req_title",
+                          "change_title",
+                          "change_type_name",
+                          "budget_code",
+                          "budget_title"],
         'mapping': {
             'properties': {
                 'year': {
@@ -571,68 +593,22 @@ TYPES_DATA = [
                         }
                     ]
     },
-    # {
-    #     'type_name': 'change_history',
-    #     'search_fields': ["change_history.model", "change_history.selector", "change_history.field", "change_history.from_value", "change_history.to_value"],
-    #     'mapping': {
-    #         'properties': {
-    #             'model': {
-    #                 'type': 'string'
-    #             },
-    #             'time': {
-    #                 'type': 'date',
-    #                 'format': 'dd/MM/yy||yyyy-MM-dd'
-    #             },
-    #             'field': {
-    #                 'type': 'string',
-    #             },
-    #             'from_value': {
-    #                 'type': 'string',
-    #                 'analyzer': 'hebrew',
-    #                 'fields': {
-    #                     'raw': {
-    #                         'type': 'string',
-    #                         'index': 'not_analyzed'
-    #                     }
-    #                 }
-    #             },
-    #             'to_value': {
-    #                 'type': 'string',
-    #                 'analyzer': 'hebrew',
-    #                 'fields': {
-    #                     'raw': {
-    #                         'type': 'string',
-    #                         'index': 'not_analyzed'
-    #                     }
-    #                 }
-    #             },
-    #             'created': {
-    #                 'type': 'boolean'
-    #             }
-    #         }
-    #     },
-    #     'date_fields': {
-    #         'from': 'time',
-    #         'to': 'time'
-    #     },
-    #     "range_structure": {
-    #                         'time': {
-    #                             "gte": "from_date",
-    #                             "lte": "to_date"
-    #                         }
-    #                     },
-    #     'sort_method': [
-    #                     {
-    #                         "time": {
-    #                             "order": "desc"
-    #                         }
-    #                     }
-    #                 ]
-    # },
     {
         'type_name': 'entities',
-        'search_fields': ["entities.kind", "entities.name", "entities.manpower_contractor", "entities.service_contractor", "entities.company_name", "entities.company_status", "entities.company_type", "entities.company_government", "entities.company_limit", "entities.company_government", \
-                          "entities.company_limit", "entities.company_mafera", "entities.company_address", "entities.company_city"],
+        'search_fields': ["kind",
+                          "name",
+                          "manpower_contractor",
+                          "service_contractor",
+                          "company_name",
+                          "company_status",
+                          "company_type",
+                          "company_government",
+                          "company_limit",
+                          "company_government",
+                          "company_limit",
+                          "company_mafera",
+                          "company_address",
+                          "company_city"],
         'mapping': {
             'properties': {
                 'id': {
