@@ -659,24 +659,10 @@ TYPES_DATA = [
                     }
                 },
                 'manpower_contractor': {
-                    'type': 'string',
-                    'analyzer': 'hebrew',
-                    'fields': {
-                        'raw': {
-                            'type': 'string',
-                            'index': 'not_analyzed'
-                        }
-                    }
+                    'type': 'object',
                 },
                 'service_contractor': {
-                    'type': 'string',
-                    'analyzer': 'hebrew',
-                    'fields': {
-                        'raw': {
-                            'type': 'string',
-                            'index': 'not_analyzed'
-                        }
-                    }
+                    'type': 'object',
                 },
                 'gov_company': {
                     'type': 'boolean'

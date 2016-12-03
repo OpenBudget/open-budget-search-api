@@ -76,7 +76,7 @@ def import_data(input_type):
         cursor = conn.cursor()
         cursor.execute('select * from %s' % input_type)
         headers = [i[0] for i in cursor.description]
-        for row in cursor.fetchall():
+        for row in cursor:
             yield dict(zip(headers, row))
     except:
         logger.exception("exception while loading data for %s", input_type)
