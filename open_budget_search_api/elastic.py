@@ -61,8 +61,9 @@ def preperare_typed_query(type, term, from_date, to_date, search_size, offset):
                 "aggs": {
                     "stats_per_month": {
                           "date_histogram": {
-                              "field": type_definition["type_name"] + "." + type_definition['date_fields']['from'],
-                              "interval": "month"
+                              "field": type_definition['date_fields']['from'],
+                              "interval": "month",
+                              "min_doc_count": 1
                           }
                     },
                     "filtered": {
@@ -100,8 +101,9 @@ def preperare_typed_query(type, term, from_date, to_date, search_size, offset):
 
     must = body["aggs"]["filtered"]["filter"]["bool"]["must"]
     range_obj = must[1]["range"]
-    if temporal_type(type):
-        must.remove(body["aggs"]["filtered"]["filter"]["bool"]["must"][1])
+    if not temporal_type(type):
+        must.pop(-1)
+        del body["aggs"]["stats_per_month"]
     else:
         range_obj[type_definition['date_fields']['from']]["gte"] = from_date
         range_obj[type_definition['date_fields']['to']]["lte"] = to_date
