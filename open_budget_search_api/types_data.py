@@ -173,29 +173,29 @@ TYPES_DATA = [
                           "page_title",
                           "entity_kind"],
         'date_fields': {
-            'from' : 'start_date',
+            'from': 'start_date',
             'to': 'end_date'
         },
         'range_structure': {
-                            "start_date":{
-                                        "gte": "from_date"
-                                    },
-                            "end_date":{
-                                        "lte": "to_date"
-                                    }
-                            },
-        'sort_method':[
-                        {
-                            "start_date": {
-                                "order": "desc"
-                            }
-                        },
-                        {
-                            "volume": {
-                                "order": "desc"
-                            }
-                        }
-                    ]
+            "start_date": {
+                "gte": "from_date"
+            },
+            "end_date": {
+                "lte": "to_date"
+            }
+        },
+        'sort_method': [
+            {
+                "start_date": {
+                    "order": "desc"
+                }
+            },
+            {
+                "volume": {
+                    "order": "desc"
+                }
+            }
+        ]
 
     },
     {
@@ -349,23 +349,23 @@ TYPES_DATA = [
             'to': 'year'
         },
         "range_structure": {
-                            'year': {
-                                "gte": "from_date",
-                                "lte": "to_date"
-                            }
-                        },
-        'sort_method':[
-                        {
-                            "year": {
-                                "order": "desc"
-                            }
-                        },
-                        {
-                            "net_revised": {
-                                "order": "desc"
-                            }
-                        }
-                    ]
+            'year': {
+                "gte": "from_date",
+                "lte": "to_date"
+            }
+        },
+        'sort_method': [
+            {
+                "year": {
+                    "order": "desc"
+                }
+            },
+            {
+                "net_revised": {
+                    "order": "desc"
+                }
+            }
+        ]
     },
     {
         'type_name': 'supports',
@@ -392,13 +392,13 @@ TYPES_DATA = [
                     }
                 },
                 'code': {
-                     'type': 'string',
-                        'fields': {
-                            'raw': {
-                                'type': 'string',
-                                'index': 'not_analyzed'
-                            }
+                    'type': 'string',
+                    'fields': {
+                        'raw': {
+                            'type': 'string',
+                            'index': 'not_analyzed'
                         }
+                    }
                 },
                 'recipient': {
                     'type': 'string',
@@ -458,23 +458,23 @@ TYPES_DATA = [
             'to': 'year'
         },
         "range_structure": {
-                            'year': {
-                                "gte": "from_date",
-                                "lte": "to_date"
-                            }
-                        },
+            'year': {
+                "gte": "from_date",
+                "lte": "to_date"
+            }
+        },
         'sort_method': [
-                        {
-                            "year": {
-                                "order": "desc"
-                            }
-                        },
-                        {
-                            "amount_allocated": {
-                                "order": "desc"
-                            }
-                        }
-                    ]
+            {
+                "year": {
+                    "order": "desc"
+                }
+            },
+            {
+                "amount_allocated": {
+                    "order": "desc"
+                }
+            }
+        ]
     },
     {
         'type_name': 'changes',
@@ -575,23 +575,23 @@ TYPES_DATA = [
             'to': 'date'
         },
         "range_structure": {
-                            'date': {
-                                "gte": "from_date",
-                                "lte": "to_date"
-                            }
-                        },
+            'date': {
+                "gte": "from_date",
+                "lte": "to_date"
+            }
+        },
         'sort_method': [
-                        {
-                            "date": {
-                                "order": "desc"
-                            }
-                        },
-                        {
-                            "gross_expense_diff": {
-                                "order": "desc"
-                            }
-                        }
-                    ]
+            {
+                "date": {
+                    "order": "desc"
+                }
+            },
+            {
+                "gross_expense_diff": {
+                    "order": "desc"
+                }
+            }
+        ]
     },
     {
         'type_name': 'entities',
@@ -623,7 +623,7 @@ TYPES_DATA = [
                             'index': 'not_analyzed'
                         }
                     }
-               },
+                },
                 'name': {
                     'type': 'string',
                     'analyzer': 'hebrew',
@@ -749,21 +749,233 @@ TYPES_DATA = [
             'to': 'NA'
         },
         "range_structure": {
-                            'time': {
-                                "gte": "NA",
-                                "lte": "NA"
-                            }
-                        },
+            'time': {
+                "gte": "NA",
+                "lte": "NA"
+            }
+        },
         'sort_method': [
-                        {
-                            "id": {
-                                "order": "desc"
-                            }
+            {
+                "id": {
+                    "order": "desc"
+                }
+            }
+        ]
+    },
+    {
+        'type_name': 'procurement',
+        'mapping': {
+            'properties': {
+                'publisher': {
+                    'type': 'string',
+                    'analyzer': 'hebrew',
+                    'fields': {
+                        'raw': {
+                            'type': 'string',
+                            'index': 'not_analyzed'
                         }
-                    ]
+                    }
+                },
+                'purchasing_unit': {
+                    'type': 'string',
+                    'analyzer': 'hebrew',
+                    'fields': {
+                        'raw': {
+                            'type': 'string',
+                            'index': 'not_analyzed'
+                        }
+                    }
+                },
+                'buyer_description': {
+                    'type': 'string',
+                    'analyzer': 'hebrew',
+                    'fields': {
+                        'raw': {
+                            'type': 'string',
+                            'index': 'not_analyzed'
+                        }
+                    }
+                },
+                'budget_code': {
+                    'type': 'long'
+                },
+                'budget_title': {
+                    'type': 'string',
+                    'analyzer': 'hebrew',
+                    'fields': {
+                        'raw': {
+                            'type': 'string',
+                            'index': 'not_analyzed'
+                        }
+                    }
+                },
+                'supplier_code': {
+                    'type': 'long'
+                },
+                'supplier_name': {
+                    'type': 'string',
+                    'analyzer': 'hebrew',
+                    'fields': {
+                        'raw': {
+                            'type': 'string',
+                            'index': 'not_analyzed'
+                        }
+                    }
+                },
+                'volume': {
+                    'type': 'double'
+                },
+                'executed': {
+                    'type': 'double'
+                },
+                'currency': {
+                    'type': 'string',
+                    'index': 'not_analyzed'
+                },
+                'purchase_method': {
+                    'type': 'string',
+                    'analyzer': 'hebrew',
+                    'fields': {
+                        'raw': {
+                            'type': 'string',
+                            'index': 'not_analyzed'
+                        }
+                    }
+                },
+                'manof_ref': {
+                    'type': 'string'
+                },
+                'exemption_reason': {
+                    'type': 'string',
+                    'analyzer': 'hebrew',
+                    'fields': {
+                        'raw': {
+                            'type': 'string',
+                            'index': 'not_analyzed'
+                        }
+                    }
+                },
+                'purpose': {
+                    'type': 'string',
+                    'analyzer': 'hebrew',
+                    'fields': {
+                        'raw': {
+                            'type': 'string',
+                            'index': 'not_analyzed'
+                        }
+                    }
+                },
+                'order_id': {
+                    'type': 'long'
+                },
+                'sensitive_order': {
+                    'type': 'boolean'
+                },
+                'report_date': {
+                    'type': 'date',
+                    'format': 'date'
+                },
+                'report_title': {
+                    'type': 'string',
+                    'analyzer': 'hebrew',
+                    'fields': {
+                        'raw': {
+                            'type': 'string',
+                            'index': 'not_analyzed'
+                        }
+                    }
+                },
+                'report_publisher': {
+                    'type': 'string',
+                    'analyzer': 'hebrew',
+                    'fields': {
+                        'raw': {
+                            'type': 'string',
+                            'index': 'not_analyzed'
+                        }
+                    }
+                },
+                'report_subunit': {
+                    'type': 'string',
+                    'analyzer': 'hebrew',
+                    'fields': {
+                        'raw': {
+                            'type': 'string',
+                            'index': 'not_analyzed'
+                        }
+                    }
+                },
+                'report_error': {
+                    'type': 'string',
+                    'index': 'not_analyzed'
+                },
+                'report_href': {
+                    'type': 'string',
+                    'index': 'not_analyzed'
+                },
+                'report_container_href': {
+                    'type': 'string',
+                    'index': 'not_analyzed'
+                },
+                'report_year': {
+                    'type': 'integer'
+                },
+                'report_period': {
+                    'type': 'integer'
+                },
+                'report_date': {
+                    'type': 'date',
+                    'format': 'date'
+                },
+                'entity_id': {
+                    'type': 'long'
+                },
+                'entity_kind': {
+                    'type': 'string',
+                    'index': 'not_analyzed'
+                }
+            }
+        },
+        'search_fields': ["publisher",
+                          "regulation",
+                          "supplier",
+                          "contact",
+                          "contact_email",
+                          "description",
+                          "reason",
+                          "decision",
+                          "url",
+                          "subjects",
+                          "source_currency",
+                          "page_title",
+                          "entity_kind"],
+        'date_fields': {
+            'from': 'start_date',
+            'to': 'end_date'
+        },
+        'range_structure': {
+            "start_date": {
+                "gte": "from_date"
+            },
+            "end_date": {
+                "lte": "to_date"
+            }
+        },
+        'sort_method': [
+            {
+                "start_date": {
+                    "order": "desc"
+                }
+            },
+            {
+                "volume": {
+                    "order": "desc"
+                }
+            }
+        ]
+
     }
 ]
-
 
 KEYS = {
     'budget': ['year', 'code'],
@@ -771,4 +983,5 @@ KEYS = {
     'supports': ['year', 'code', 'recipient', 'kind'],
     'changes': ['year', 'leading_item', 'req_code', 'budget_code'],
     'entities': ['id'],
+    'procurement': ['order_id', 'budget_code', 'report_date', 'report_title']
 }

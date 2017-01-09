@@ -9,8 +9,8 @@ DB_PORT = os.environ.get('DB_PORT')
 db_connection_string = 'postgresql://{}:{}@{}:{}/{}'\
     .format(DB_USER, DB_PWD, DB_HOST, DB_PORT, DB_DB)
 
-ES_HOST = os.environ.get('ES_HOST')
-ES_PORT = os.environ.get('ES_PORT')
+ES_HOST = os.environ.get('ES_HOST', 'localhost')
+ES_PORT = os.environ.get('ES_PORT', '9200')
 
 es_connection_string = '{}:{}'\
     .format(ES_HOST, ES_PORT)
