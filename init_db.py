@@ -19,7 +19,7 @@ def clean():
 
 def create_mapping(_type, doc_body):
     es = get_es_client()
-    logger.info("Creating MAPPING %s", type)
+    logger.info("Creating MAPPING %s", _type)
     es.indices.put_mapping(index=INDEX_NAME, doc_type=_type, body=doc_body)
 
 

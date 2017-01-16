@@ -85,7 +85,7 @@ TYPES_DATA = [
                     }
                 },
                 'volume': {
-                    'type': 'long'
+                    'type': 'double'
                 },
                 'reason': {
                     'type': 'string',
@@ -797,7 +797,7 @@ TYPES_DATA = [
                     }
                 },
                 'budget_code': {
-                    'type': 'long'
+                    'type': 'string'
                 },
                 'budget_title': {
                     'type': 'string',
@@ -928,11 +928,16 @@ TYPES_DATA = [
                     'format': 'date'
                 },
                 'entity_id': {
-                    'type': 'long'
+                    'type': 'string'
                 },
                 'entity_kind': {
                     'type': 'string',
-                    'index': 'not_analyzed'
+                    'fields': {
+                        'raw': {
+                            'type': 'string',
+                            'index': 'not_analyzed'
+                        }
+                    }
                 }
             }
         },
