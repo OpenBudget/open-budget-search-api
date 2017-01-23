@@ -37,6 +37,40 @@ def create_index():
                 'index': {
                     'number_of_shards': 6,
                     'number_of_replicas': 1
+                },
+                "analysis": {
+                    "filter": {
+                        "nGram_filter": {
+                            "type": "nGram",
+                            "min_gram": 2,
+                            "max_gram": 20,
+                            "token_chars": [
+                                "letter",
+                                "digit",
+                                "punctuation",
+                                "symbol"
+                            ]
+                        }
+                    },
+                    "analyzer": {
+                        "nGram_analyzer": {
+                            "type": "custom",
+                            "tokenizer": "whitespace",
+                            "filter": [
+                                "lowercase",
+                                "asciifolding",
+                                "nGram_filter"
+                            ]
+                        },
+                        "whitespace_analyzer": {
+                            "type": "custom",
+                            "tokenizer": "whitespace",
+                            "filter": [
+                                "lowercase",
+                                "asciifolding"
+                            ]
+                        }
+                    }
                 }
             }
         })
@@ -95,7 +129,7 @@ def initialize_db(table=None):
 
 
 if __name__ == "__main__":
-    if len(sys.argv)>1:
+    if len(sys.argv) > 1:
         initialize_db(sys.argv[1])
     else:
         initialize_db()

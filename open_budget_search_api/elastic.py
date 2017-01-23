@@ -164,5 +164,22 @@ def search(types, term, from_date, to_date, size, offset):
     return ret_val
 
 
+def autocomplete(term):
+    es = get_es_client()
+    query_body = {
+        "size": 10,
+        "query": {
+            "match": {
+                "_all": {
+                    "query": term,
+                    "operator": "and"
+                }
+            }
+        }
+    }
+    elastic_result = es.search(body=query_body)
+    return elastic_result
+
+
 # def simple_search_exemptions(a, b):
 #     return True
