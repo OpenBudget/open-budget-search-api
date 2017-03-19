@@ -232,7 +232,6 @@ TYPES_DATA = [
                 },
                 'year': {
                     'type': 'date',
-                    'format': 'date',
                     'include_in_all': False
                 },
                 'title': {
@@ -420,7 +419,6 @@ TYPES_DATA = [
             'properties': {
                 'year': {
                     'type': 'date',
-                    'format': 'date',
                     'include_in_all': False
                 },
                 'subject': {
@@ -538,7 +536,6 @@ TYPES_DATA = [
             'properties': {
                 'year': {
                     'type': 'date',
-                    'format': 'date',
                     'include_in_all': False
                 },
                 'leading_item': {
@@ -627,7 +624,6 @@ TYPES_DATA = [
                 },
                 'date': {
                     'type': 'date',
-                    'format': 'date',
                     'format': 'dd/MM/yyyy||yyyy-MM-dd',
                     'include_in_all': False
                 },
@@ -666,16 +662,15 @@ TYPES_DATA = [
                           "name",
                           "manpower_contractor",
                           "service_contractor",
-                          "gov company",
                           "company_name",
                           "company_status",
                           "company_type",
                           "company_government",
                           "company_limit",
-                          "company_postal_code",
+                          "company_government",
+                          "company_limit",
                           "company_mafera",
                           "company_address",
-                          "company_ceo",
                           "company_city"],
         'mapping': {
             '_all': {
