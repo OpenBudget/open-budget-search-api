@@ -74,6 +74,7 @@ def create_index():
                 }
             }
         })
+        es.indices.flush(INDEX_NAME)
         map_tables()
 
 
