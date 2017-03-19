@@ -3,6 +3,7 @@ set -e
 
 cd $APP_PATH
 sleep 10
+python3 init_db.py clean
 python3 init_db.py
 python3 init_db.py budget &
 python3 init_db.py exemption &
