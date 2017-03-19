@@ -3,7 +3,7 @@ TYPES_DATA = [
         'type_name': 'exemption',
         'mapping': {
             '_all': {
-                'index_analyzer': 'nGram_analyzer',
+                'analyzer': 'nGram_analyzer',
                 'search_analyzer': 'whitespace_analyzer'
             },
             'properties': {
@@ -217,7 +217,7 @@ TYPES_DATA = [
         'type_name': 'budget',
         'mapping': {
             '_all': {
-                'index_analyzer': 'nGram_analyzer',
+                'analyzer': 'nGram_analyzer',
                 'search_analyzer': 'whitespace_analyzer'
             },
             'properties': {
@@ -414,7 +414,7 @@ TYPES_DATA = [
                           "entity_kind"],
         'mapping': {
             '_all': {
-                'index_analyzer': 'nGram_analyzer',
+                'analyzer': 'nGram_analyzer',
                 'search_analyzer': 'whitespace_analyzer'
             },
             'properties': {
@@ -532,7 +532,7 @@ TYPES_DATA = [
                           "budget_title"],
         'mapping': {
             '_all': {
-                'index_analyzer': 'nGram_analyzer',
+                'analyzer': 'nGram_analyzer',
                 'search_analyzer': 'whitespace_analyzer'
             },
             'properties': {
@@ -679,7 +679,7 @@ TYPES_DATA = [
                           "company_city"],
         'mapping': {
             '_all': {
-                'index_analyzer': 'nGram_analyzer',
+                'analyzer': 'nGram_analyzer',
                 'search_analyzer': 'whitespace_analyzer'
             },
             'properties': {
@@ -846,7 +846,7 @@ TYPES_DATA = [
         'type_name': 'procurement',
         'mapping': {
             '_all': {
-                'index_analyzer': 'nGram_analyzer',
+                'analyzer': 'nGram_analyzer',
                 'search_analyzer': 'whitespace_analyzer'
             },
             'properties': {
