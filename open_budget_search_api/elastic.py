@@ -49,13 +49,9 @@ def preperare_typed_query(type, term, from_date, to_date, search_size, offset):
     type_definition = get_type_definition(type)
     body = {
                 "query": {
-                    "filtered": {
-                        "query": {
-                            "query_string": {
-                                "fields": type_definition["search_fields"],
-                                "query": term
-                            }
-                        }
+                    "multi_match": {
+                        "query": term,
+                        "fields": type_definition["search_fields"]
                     }
                 },
                 "aggs": {
@@ -145,6 +141,8 @@ def search(types, term, from_date, to_date, size, offset):
             return {"message": "not a real type"}
         query_body = preperare_typed_query(type, term, from_date, to_date, size, offset)
         logger.info('Running QUERY:\n%s', json.dumps(query_body, indent=2, sort_keys=True))
+        print("&&&&&&&&&&&&&&&&")
+        print(json.dumps(query_body, indent=2, sort_keys=True))
         elastic_result[type] = es.search(index=INDEX_NAME,
                                          body=query_body)
         ret_val[type] = {}
