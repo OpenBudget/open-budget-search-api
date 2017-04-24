@@ -22,6 +22,7 @@ def main_handler():
 @app.route('/search/<string:types>/<string:search_term>/<string:from_date>/<string:to_date>/<string:size>/<string:offset>',
            methods=['GET'])
 def search_handler(types, search_term, from_date, to_date, size, offset):
+    print("in handler")
     types_formatted = str(types).split(",")
     try:
         result = search(types_formatted, search_term, from_date, to_date, size, offset)
