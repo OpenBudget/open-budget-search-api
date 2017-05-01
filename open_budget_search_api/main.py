@@ -8,7 +8,9 @@ app = Flask(__name__)
 CORS(app)
 
 
-@app.route('/search/<string:types>/<string:search_term>/<string:from_date>/<string:to_date>/<string:size>/<string:offset>',
+@app.route('/search/<string:types>/<string:search_term>/'
+           '<string:from_date>/<string:to_date>/'
+           '<string:size>/<string:offset>',
            methods=['GET'])
 def search_handler(types, search_term, from_date, to_date, size, offset):
     types_formatted = str(types).split(",")
