@@ -1,77 +1,29 @@
 import json
 import re
-import elasticsearch
 
-from .types_data import TYPES_DATA
-from .config import INDEX_NAME, ES_SERVERS_LIST, DEFAULT_TIMEOUT
+from .data_sources import sources
+from .config import INDEX_NAME, get_es_client
 from .logger import logger
 
-# EXEMPTION_SEARCH_FIELD_LIST = ["exemptions.publisher", "exemptions.regulation", "exemptions.supplier",\
-#  "exemptions.contact", "exemptions.contact_email", "exemptions.description", "exemptions.reason",\
-#  "exemptions.decision", "exemptions.url", "exemptions.subjects", "exemptions.source_currency",\
-#  "exemptions.page_title", "exemptions.entity_kind"]
-# BUDGET_SEARCH_FIELD_LIST = ["budget.title","budget.req_title", "budget.change_title", "budget.change_type_name",\
-#  "budget.budget_title", "budget.pending", "budget.properties"]
 
-
-def get_es_client():
-    return elasticsearch.Elasticsearch(ES_SERVERS_LIST, timeout=DEFAULT_TIMEOUT)
-
-
-# def search(term):
-#     es = get_es_client()
-#     return simple_search_exemptions(es, term)
-
-
-def index_doc(type_name, doc):
-    es = get_es_client()
-    return es.index(index=INDEX_NAME, doc_type=type_name, body=doc)
-
-
-def get_type_definition(type):
-    for definition in TYPES_DATA:
-        if definition["type_name"] == type:
-            return definition
-
-
-def is_real_type(type_):
-    for definition in TYPES_DATA:
-        if definition["type_name"] == type_:
-            return True
-    return False
-
-
-def temporal_type(type_):
-    return type_ != 'entities'
-
-
-def preperare_typed_query(type, term, from_date, to_date, search_size, offset):
-    type_definition = get_type_definition(type)
+def prepare_typed_query(type_name, term, from_date, to_date, search_size, offset):
+    ds = sources[type_name]
     body = {
                 "query": {
                     "multi_match": {
                         "query": term,
-                        "fields": type_definition["search_fields"]
+                        "fields": ds.search_fields
                     }
                 },
                 "aggs": {
-                    "stats_per_month": {
-                          "date_histogram": {
-                              "field": type_definition['date_fields']['from'],
-                              "interval": "month",
-                              "min_doc_count": 1
-                          }
-                    },
                     "filtered": {
                         "filter": {
                             "bool": {
                                 "must": [
                                     {
                                         "type": {
-                                            "value": type
+                                            "value": type_name
                                         }
-                                    }, {
-                                        "range": type_definition['range_structure']
                                     }
                                 ]
                             }
@@ -86,7 +38,7 @@ def preperare_typed_query(type, term, from_date, to_date, search_size, offset):
                                             "*": {}
                                         }
                                     },
-                                    "sort": type_definition['sort_method']
+                                    "sort": ds.sort_method
                                 }
                             }
                         }
@@ -96,13 +48,20 @@ def preperare_typed_query(type, term, from_date, to_date, search_size, offset):
     }
 
     must = body["aggs"]["filtered"]["filter"]["bool"]["must"]
-    range_obj = must[1]["range"]
-    if not temporal_type(type):
-        must.pop(-1)
-        del body["aggs"]["stats_per_month"]
-    else:
-        range_obj[type_definition['date_fields']['from']]["gte"] = from_date
-        range_obj[type_definition['date_fields']['to']]["lte"] = to_date
+    if ds.is_temporal:
+        body["aggs"]["stats_per_month"] = {
+            "date_histogram": {
+                "field": ds.date_fields['from'],
+                "interval": "month",
+                "min_doc_count": 1
+            }
+        }
+        range_obj = ds.range_structure
+        range_obj[ds.date_fields['from']]["gte"] = from_date
+        range_obj[ds.date_fields['to']]["lte"] = to_date
+        must.append({
+            "range": range_obj
+        })
     return body
 
 
@@ -123,36 +82,30 @@ def parse_highlights(highlights):
     return parsed_highlights
 
 
-def parse_budget_result(elastic_result):
-    budget_result = dict(current={}, past={})
-    budget_result["total"] = elastic_result["aggregations"]["filtered"]["top_results"]["hits"]["hits"]
-    for i, doc in enumerate(elastic_result["aggregations"]["filtered"]["top_results"]["hits"]["hits"]):
-                    budget_result[type]["docs"][i] = {}
-                    budget_result[type]["docs"][i]["source"] = doc["_source"]
-                    budget_result[type]["docs"][i]["highlight"] = parse_highlights(doc["highlight"])
-
-
 def search(types, term, from_date, to_date, size, offset):
     es = get_es_client()
     elastic_result = {}
     ret_val = {}
-    for type in types:
-        if is_real_type(type) is False:
-            return {"message": "not a real type"}
-        query_body = preperare_typed_query(type, term, from_date, to_date, size, offset)
+    for type_name in types:
+        if type_name not in sources:
+            return {"message": "not a real type %s" % type_name}
+        ds = sources[type_name]
+        query_body = prepare_typed_query(type_name, term, from_date, to_date, size, offset)
         logger.info('Running QUERY:\n%s', json.dumps(query_body, indent=2, sort_keys=True))
-        elastic_result[type] = es.search(index=INDEX_NAME,
-                                         body=query_body)
-        ret_val[type] = {}
+        elastic_result[type_name] = es.search(index=INDEX_NAME,
+                                              body=query_body)
+        ret_val[type_name] = {}
 
-        if temporal_type(type):
-            ret_val[type]["total_in_result"] = len(elastic_result[type]["aggregations"]["filtered"]["top_results"]["hits"]["hits"])
-            ret_val[type]["data_time_distribution"] = elastic_result[type]["aggregations"]["stats_per_month"]["buckets"]
+        if ds.is_temporal:
+            ret_val[type]["total_in_result"] = \
+                len(elastic_result[type_name]["aggregations"]["filtered"]["top_results"]["hits"]["hits"])
+            ret_val[type]["data_time_distribution"] = \
+                elastic_result[type_name]["aggregations"]["stats_per_month"]["buckets"]
 
-        ret_val[type]["total_overall"] = elastic_result[type]["hits"]["total"]
-        ret_val[type]["docs"] = []
+        ret_val[type_name]["total_overall"] = elastic_result[type_name]["hits"]["total"]
+        ret_val[type_name]["docs"] = []
 
-        for doc in elastic_result[type]["aggregations"]["filtered"]["top_results"]["hits"]["hits"]:
+        for doc in elastic_result[type_name]["aggregations"]["filtered"]["top_results"]["hits"]["hits"]:
             rec = {'source': doc["_source"],
                    'highlight': parse_highlights(doc["highlight"])}
             ret_val[type]["docs"].append(rec)
@@ -175,7 +128,3 @@ def autocomplete(term):
     }
     elastic_result = es.search(body=query_body)
     return elastic_result
-
-
-# def simple_search_exemptions(a, b):
-#     return True

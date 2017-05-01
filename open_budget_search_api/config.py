@@ -1,13 +1,5 @@
 import os
-
-DB_DB = os.environ.get('DB_DB')
-DB_USER = os.environ.get('DB_USER')
-DB_PWD = os.environ.get('DB_PWD')
-DB_HOST = os.environ.get('DB_HOST')
-DB_PORT = os.environ.get('DB_PORT')
-
-db_connection_string = 'postgresql://{}:{}@{}:{}/{}'\
-    .format(DB_USER, DB_PWD, DB_HOST, DB_PORT, DB_DB)
+import elasticsearch
 
 ES_HOST = os.environ.get('ES_HOST', 'localhost')
 ES_PORT = os.environ.get('ES_PORT', '9200')
@@ -18,3 +10,16 @@ es_connection_string = '{}:{}'\
 INDEX_NAME = 'obudget'
 ES_SERVERS_LIST = [ES_HOST]
 DEFAULT_TIMEOUT = 60
+
+DATAPACKAGES = [
+    "http://next.obudget.org/datapackages/entities/all/datapackage.json"
+]
+
+_es = None
+
+
+def get_es_client():
+    global _es
+    if _es is None:
+        _es = elasticsearch.Elasticsearch(ES_SERVERS_LIST, timeout=DEFAULT_TIMEOUT)
+    return _es

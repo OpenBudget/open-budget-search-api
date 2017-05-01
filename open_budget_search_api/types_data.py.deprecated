@@ -1076,3 +1076,8 @@ KEYS = {
     'entities': ['id'],
     'procurement': ['order_id', 'budget_code', 'report_date', 'report_title']
 }
+
+
+DATAPACKAGES = [
+    "http://next.obudget.org/datapackages/entities/all/datapackage.json"
+]

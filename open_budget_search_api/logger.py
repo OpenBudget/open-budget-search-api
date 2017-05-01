@@ -2,8 +2,8 @@ import sys
 import logging
 
 logger = logging.getLogger('obudget')
-hdlr = logging.StreamHandler(sys.stderr)
+handler = logging.StreamHandler(sys.stderr)
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-hdlr.setFormatter(formatter)
-logger.addHandler(hdlr)
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 logger.setLevel(logging.INFO)
