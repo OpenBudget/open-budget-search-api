@@ -2,8 +2,8 @@ FROM codexfons/gunicorn
 
 USER root
 
-RUN apk add --update --virtual=build-dependencies wget ca-certificates python3-dev postgresql-dev build-base
-RUN apk add --update libpq libxml2 libxslt
+RUN apk add --update --virtual=build-dependencies wget ca-certificates python3-dev postgresql-dev libxml2-dev libxslt-dev build-base
+RUN apk add --update libpq libxml2 libxslt libstdc++
 RUN python3 --version
 
 COPY [a-z_A-Z]* $APP_PATH/
