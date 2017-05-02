@@ -31,6 +31,7 @@ def create_index():
 
 def initialize_db(arg=None):
     if arg == "clean":
+        logger.info('CLEANING UP')
         clean()
         create_index()
     elif arg is None:
@@ -38,10 +39,12 @@ def initialize_db(arg=None):
         print("Option 1: " + sys.argv[0] + " all")
         print("Option 2: " + sys.argv[0] + " <type name>")
     else:
+        logger.info('LOADING DATA')
         revision = int(time.time())
         es = get_es_client()
         for type_name, ds in sources.items():
             if arg == 'all' or arg == type_name:
+                logger.info('LOADING DATA for %s', type_name)
                 create_index()
                 ds.put_mapping(es)
                 ds.load(es, revision)
