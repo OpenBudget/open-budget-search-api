@@ -97,9 +97,9 @@ def search(types, term, from_date, to_date, size, offset):
         ret_val[type_name] = {}
 
         if ds.is_temporal:
-            ret_val[type]["total_in_result"] = \
+            ret_val[type_name]["total_in_result"] = \
                 len(elastic_result[type_name]["aggregations"]["filtered"]["top_results"]["hits"]["hits"])
-            ret_val[type]["data_time_distribution"] = \
+            ret_val[type_name]["data_time_distribution"] = \
                 elastic_result[type_name]["aggregations"]["stats_per_month"]["buckets"]
 
         ret_val[type_name]["total_overall"] = elastic_result[type_name]["hits"]["total"]
@@ -108,7 +108,7 @@ def search(types, term, from_date, to_date, size, offset):
         for doc in elastic_result[type_name]["aggregations"]["filtered"]["top_results"]["hits"]["hits"]:
             rec = {'source': doc["_source"],
                    'highlight': parse_highlights(doc["highlight"])}
-            ret_val[type]["docs"].append(rec)
+            ret_val[type_name]["docs"].append(rec)
 
     return ret_val
 
