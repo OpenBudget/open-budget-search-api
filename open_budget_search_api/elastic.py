@@ -86,6 +86,8 @@ def search(types, term, from_date, to_date, size, offset):
     es = get_es_client()
     elastic_result = {}
     ret_val = {}
+    if 'all' in types:
+        types = sources.keys()
     for type_name in types:
         if type_name not in sources:
             return {"message": "not a real type %s" % type_name}
