@@ -97,4 +97,7 @@ class DataSource(object):
             doc_id = ":".join(str(doc.get(k)) for k in self.keys)
             if revision is not None:
                 doc['revision'] = revision
-            es.index(INDEX_NAME, self.type_name, doc, id=doc_id)
+            try:
+                es.index(INDEX_NAME, self.type_name, doc, id=doc_id)
+            except Exception as e:
+                logger.exception("Failed to index %s row %s: %r", self.type_name, doc_id, doc)
