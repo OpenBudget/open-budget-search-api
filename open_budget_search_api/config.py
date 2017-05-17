@@ -14,6 +14,7 @@ DEFAULT_TIMEOUT = 60
 DATAPACKAGES = [
     "http://next.obudget.org/datapackages/entities/all/datapackage.json",
     "http://next.obudget.org/datapackages/procurement/spending/latest-contract-spending/datapackage.json",
+    "http://next.obudget.org/datapackages/budget/national/processed/datapackage.json",
 ]
 
 _es = None
