@@ -9,7 +9,7 @@ RUN python3 --version
 COPY [a-z_A-Z]* $APP_PATH/
 COPY open_budget_search_api/ $APP_PATH/open_budget_search_api/
 RUN ls -la /opt/app/
-RUN pip install -r $APP_PATH/requirements.txt
+RUN pip3 install -r $APP_PATH/requirements.txt
 RUN apk del build-dependencies
 RUN rm -rf /var/cache/apk/*
 
