@@ -63,8 +63,7 @@ class DataSource(object):
             # Setting the default analyzer to hebrew
             "dynamic_templates": [
                 {
-                    "template1": {
-                        "match": "*",
+                    "strings": {
                         "match_mapping_type": "string",
                         "mapping": {
                             "type": "string",
