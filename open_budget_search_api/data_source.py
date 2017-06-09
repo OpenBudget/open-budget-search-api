@@ -29,7 +29,7 @@ class DataSource(object):
                 if range_kw in field.get('search:time-range', ''):
                     self.date_fields[range_kw] = field['name']
                     self.range_structure.setdefault(field['name'], {})[operator] = range_kw + '_date'
-        self.is_temporal = len(self.date_fields) > 0
+        self.is_temporal = False  # len(self.date_fields) > 0
 
         sort_fields = sorted(
             filter(lambda f: 'search:sort-order' in f, fields),
