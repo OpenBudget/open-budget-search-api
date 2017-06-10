@@ -32,5 +32,6 @@ def autocomplete_handler(search_term):
         result = {'error': str(e)}
     return jsonify(result)
 
+
 if __name__ == "__main__":
     app.run()

@@ -2,6 +2,7 @@ from datapackage import DataPackage
 
 from .config import INDEX_NAME
 from .logger import logger
+from .mapping_generator import MappingGenerator
 
 
 class DataSource(object):
@@ -12,13 +13,13 @@ class DataSource(object):
         descriptor = self.resource.descriptor
         self.type_name = descriptor['name']
 
-        schema = descriptor['schema']
-        fields = schema['fields']
+        self._schema = descriptor['schema']
+        fields = self._schema['fields']
 
         self.search_fields = [field['name']
                               for field in fields
                               if field['type'] == 'string']
-        self.keys = schema['primaryKey']
+        self.keys = self._schema['primaryKey']
         if isinstance(self.keys, str):
             self.keys = [self.keys]
 
@@ -44,22 +45,17 @@ class DataSource(object):
             for field in sort_fields
         ]
 
-        self.mapping = self.build_mapping(schema)
+        self._mapping = None
+
+    @property
+    def mapping(self):
+        if self._mapping is None:
+            self._mapping = self.build_mapping(self._schema)
+        return self._mapping
 
     @staticmethod
-    def json_type_to_elastic_type(json_type):
-        switcher = {
-            "integer": "long",
-            "number": "double",
-            "string": "string",
-            "array": "string",
-            "object": "object"
-        }
-        return switcher.get(json_type, "string")
-
-    def build_mapping(self, schema):
-        fields = schema["fields"]
-        mapping_data = {
+    def build_mapping(schema):
+        mapping = MappingGenerator({
             # Setting the default analyzer to hebrew
             "dynamic_templates": [
                 {
@@ -77,14 +73,10 @@ class DataSource(object):
                         }
                     }
                 }
-            ],
-            "properties": {}
-        }
-        for field in fields:
-            mapping_data['properties'][field['name']] = {
-                'type': self.json_type_to_elastic_type(field["type"])
-            }
-        return mapping_data
+            ]
+        })
+        mapping.generate_from_schema(schema)
+        return mapping.get_mapping()
 
     def put_mapping(self, es):
         es.indices.put_mapping(index=INDEX_NAME, doc_type=self.type_name, body=self.mapping)
