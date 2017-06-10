@@ -22,10 +22,10 @@ def search_handler(types, search_term, from_date, to_date, size, offset):
     return jsonify(result)
 
 
-@app.route('/search/get/<string:doc_id>',
+@app.route('/search/get/<string:type_name>/<string:doc_id>',
            methods=['GET'])
-def get_document_handler(doc_id):
-    result = get_document(doc_id)
+def get_document_handler(type_name, doc_id):
+    result = get_document(type_name, doc_id)
     return jsonify(result)
 
 

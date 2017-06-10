@@ -1,5 +1,6 @@
 import json
 import re
+import elasticsearch
 
 from .data_sources import sources
 from .config import INDEX_NAME, get_es_client
@@ -82,10 +83,13 @@ def parse_highlights(highlights):
     return parsed_highlights
 
 
-def get_document(doc_id):
+def get_document(type_name, doc_id):
     es = get_es_client()
-    result = es.get(INDEX_NAME, doc_id)
-    return result.get('_source')
+    try:
+        result = es.get(INDEX_NAME, doc_id, doc_type=type_name)
+        return result.get('_source')
+    except elasticsearch.exceptions.NotFoundError:
+        return None
 
 
 def search(types, term, from_date, to_date, size, offset):
