@@ -3,7 +3,7 @@ import time
 
 from open_budget_search_api.logger import logger
 from open_budget_search_api.config import INDEX_NAME, get_es_client
-from open_budget_search_api.data_sources import sources
+from open_budget_search_api.data_sources import all_sources
 
 
 def clean():
@@ -42,7 +42,7 @@ def initialize_db(arg=None):
         logger.info('LOADING DATA')
         revision = int(time.time())
         es = get_es_client()
-        for type_name, ds in sources.items():
+        for type_name, ds in all_sources.items():
             if arg == 'all' or arg == type_name:
                 logger.info('LOADING DATA for %s', type_name)
                 create_index()

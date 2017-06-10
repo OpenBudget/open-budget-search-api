@@ -11,10 +11,13 @@ INDEX_NAME = 'obudget'
 ES_SERVERS_LIST = [ES_HOST]
 DEFAULT_TIMEOUT = 60
 
-DATAPACKAGES = [
+SEARCHABLE_DATAPACKAGES = [
     "http://next.obudget.org/datapackages/entities/all/datapackage.json",
     "http://next.obudget.org/datapackages/procurement/spending/latest-contract-spending/datapackage.json",
     "http://next.obudget.org/datapackages/budget/national/processed/connected-items/datapackage.json",
+]
+NON_SEARCHABLE_DATAPACKAGES = [
+    'http://next.obudget.org/datapackages/budgetkey/documents/datapackage.json',
 ]
 
 _es = None
