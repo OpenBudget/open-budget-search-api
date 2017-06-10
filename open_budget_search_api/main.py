@@ -1,7 +1,7 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 
-from .elastic import search, autocomplete
+from .elastic import search, autocomplete, get_document
 from .logger import logger
 
 app = Flask(__name__)
@@ -19,6 +19,13 @@ def search_handler(types, search_term, from_date, to_date, size, offset):
     except Exception as e:
         logger.exception("Error searching %s for tables: %s " % (search_term, str(types)))
         result = {'error': str(e)}
+    return jsonify(result)
+
+
+@app.route('/search/get/<string:doc_id>',
+           methods=['GET'])
+def get_document_handler(doc_id):
+    result = get_document(doc_id)
     return jsonify(result)
 
 

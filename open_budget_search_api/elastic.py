@@ -82,6 +82,12 @@ def parse_highlights(highlights):
     return parsed_highlights
 
 
+def get_document(doc_id):
+    es = get_es_client()
+    result = es.get(INDEX_NAME, doc_id)
+    return result.get('_source')
+
+
 def search(types, term, from_date, to_date, size, offset):
     es = get_es_client()
     elastic_result = {}
