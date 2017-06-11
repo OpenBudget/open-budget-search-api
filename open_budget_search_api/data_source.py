@@ -44,9 +44,12 @@ class DataSource(object):
         #     }
         #     for field in sort_fields
         # ]
-        self.scoring_column = next(iter(
-            filter(lambda f: 'es:score-column' in f, fields),
-        ))['name']
+        try:
+            self.scoring_column = next(iter(
+                filter(lambda f: 'es:score-column' in f, fields),
+            ))['name']
+        except StopIteration:
+            self.scoring_column = '<none>'
         self._mapping = None
 
     @property
