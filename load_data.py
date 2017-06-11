@@ -1,9 +1,13 @@
+import csv
+
 import sys
 import time
 
 from open_budget_search_api.logger import logger
 from open_budget_search_api.config import INDEX_NAME, get_es_client
 from open_budget_search_api.data_sources import all_sources
+
+csv.field_size_limit(500*1024)
 
 
 def clean():
