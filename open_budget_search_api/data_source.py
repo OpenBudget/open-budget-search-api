@@ -82,13 +82,16 @@ class DataSource(object):
         es.indices.put_mapping(index=INDEX_NAME, doc_type=self.type_name, body=self.mapping)
 
     def load(self, es, revision=None):
-        for i, doc in enumerate(self.resource.iter()):
-            if i % 10000 == 0:
-                logger.info('LOADING %s: %s rows', self.type_name, i)
-            doc_id = ":".join(str(doc.get(k)) for k in self.keys)
-            if revision is not None:
-                doc['revision'] = revision
-            try:
-                es.index(INDEX_NAME, self.type_name, doc, id=doc_id)
-            except Exception as e:
-                logger.exception("Failed to index %s row %s: %r", self.type_name, doc_id, doc)
+        try:
+            for i, doc in enumerate(self.resource.iter()):
+                if i % 10000 == 0:
+                    logger.info('LOADING %s: %s rows', self.type_name, i)
+                doc_id = ":".join(str(doc.get(k)) for k in self.keys)
+                if revision is not None:
+                    doc['revision'] = revision
+                try:
+                    es.index(INDEX_NAME, self.type_name, doc, id=doc_id)
+                except Exception:
+                    logger.exception("Failed to index %s row %s: %r", self.type_name, doc_id, doc)
+        except Exception:
+            logger.exception("Failed to load %s", self.type_name)
