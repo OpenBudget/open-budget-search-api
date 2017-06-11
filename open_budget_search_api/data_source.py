@@ -32,19 +32,21 @@ class DataSource(object):
                     self.range_structure.setdefault(field['name'], {})[operator] = range_kw + '_date'
         self.is_temporal = False  # len(self.date_fields) > 0
 
-        sort_fields = sorted(
-            filter(lambda f: 'search:sort-order' in f, fields),
-            key=lambda f: f['search:sort-order']
-        )
-        self.sort_method = [
-            {
-                field['name']: {
-                    'order': field['search:sort-direction']
-                }
-            }
-            for field in sort_fields
-        ]
-
+        # sort_fields = sorted(
+        #     filter(lambda f: 'search:sort-order' in f, fields),
+        #     key=lambda f: f['search:sort-order']
+        # )
+        # self.sort_method = [
+        #     {
+        #         field['name']: {
+        #             'order': field['search:sort-direction']
+        #         }
+        #     }
+        #     for field in sort_fields
+        # ]
+        self.scoring_column = next(iter(
+            filter(lambda f: 'es:score-column' in f, fields),
+        ))['name']
         self._mapping = None
 
     @property

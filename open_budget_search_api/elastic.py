@@ -11,9 +11,19 @@ def prepare_typed_query(type_name, term, from_date, to_date, search_size, offset
     ds = sources[type_name]
     body = {
                 "query": {
-                    "multi_match": {
-                        "query": term,
-                        "fields": ds.search_fields
+                    "function_score": {
+                        "query": {
+                            "multi_match": {
+                                "query": term,
+                                "fields": ds.search_fields
+                            }
+                        },
+                        "script_score": {
+                            "script": {
+                                "lang": "painless",
+                                "inline": "_score * doc['%s'].value" % ds.scoring_column
+                            }
+                        }
                     }
                 },
                 "aggs": {
@@ -38,8 +48,7 @@ def prepare_typed_query(type_name, term, from_date, to_date, search_size, offset
                                         "fields": {
                                             "*": {}
                                         }
-                                    },
-                                    "sort": ds.sort_method
+                                    }
                                 }
                             }
                         }
