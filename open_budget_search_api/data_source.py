@@ -65,6 +65,7 @@ class DataSource(object):
             "dynamic_templates": [
                 {
                     "strings": {
+                        "match": "*",
                         "match_mapping_type": "string",
                         "mapping": {
                             "type": "string",
