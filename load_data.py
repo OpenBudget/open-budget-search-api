@@ -1,5 +1,6 @@
 import csv
-
+import itertools
+import collections
 import sys
 import time
 
@@ -46,12 +47,15 @@ def initialize_db(arg=None):
         logger.info('LOADING DATA')
         revision = int(time.time())
         es = get_es_client()
+        to_load = []
         for type_name, ds in all_sources.items():
             if arg == 'all' or arg == type_name:
                 logger.info('LOADING DATA for %s', type_name)
                 create_index()
                 ds.put_mapping(es)
-                ds.load(es, revision)
+                to_load.append(ds)
+        it = itertools.zip_longest(ds.load(es, revision) for ds in to_load)
+        collections.deque(it, maxlen=0)
 
 
 if __name__ == "__main__":

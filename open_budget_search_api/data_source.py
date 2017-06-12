@@ -99,5 +99,6 @@ class DataSource(object):
                     es.index(INDEX_NAME, self.type_name, doc, id=doc_id)
                 except Exception:
                     logger.exception("Failed to index %s row %s: %r", self.type_name, doc_id, doc)
+                yield doc_id
         except Exception:
             logger.exception("Failed to load %s", self.type_name)
