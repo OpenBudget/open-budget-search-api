@@ -29,23 +29,23 @@ def create_index():
                     "number_of_shards": 6,
                     "number_of_replicas": 1
                 },
-                "analysis.analyzer": {
-                    "default": {
-                        "type": "hebrew"
-                    },
+            },
+            "analysis.analyzer": {
+                "default": {
+                    "type": "hebrew"
                 },
-                "mappings": {
-                    "_default_": {
-                        "dynamic_templates": [{
-                            "strings": {
-                                "match": "*",
-                                "match_mapping_type": "text",
-                                "mapping": {
-                                    "analyzer": "hebrew",
-                                }
+            },
+            "mappings": {
+                "_default_": {
+                    "dynamic_templates": [{
+                        "strings": {
+                            "match": "*",
+                            "match_mapping_type": "text",
+                            "mapping": {
+                                "analyzer": "hebrew",
                             }
-                        }]
-                    }
+                        }
+                    }]
                 }
             }
         })
