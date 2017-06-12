@@ -66,9 +66,9 @@ class DataSource(object):
                 {
                     "strings": {
                         "match": "*",
-                        "match_mapping_type": "string",
+                        "match_mapping_type": "text",
                         "mapping": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "hebrew",
                             "fields": {
                                 "raw": {
