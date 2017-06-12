@@ -62,24 +62,18 @@ class DataSource(object):
     def build_mapping(schema):
         mapping = MappingGenerator({
             # Setting the default analyzer to hebrew
-            "dynamic_templates": [
-                {
-                    "strings": {
-                        "match": "*",
-                        "match_mapping_type": "text",
-                        "mapping": {
-                            "type": "text",
-                            "analyzer": "hebrew",
-                            "fields": {
-                                "raw": {
-                                    "type": "string",
-                                    "index": "not_analyzed"
-                                }
-                            }
-                        }
-                    }
-                }
-            ]
+            # "dynamic_templates": [
+            #     {
+            #         "strings": {
+            #             "match": "*",
+            #             "match_mapping_type": "text",
+            #             "mapping": {
+            #                 "type": "text",
+            #                 "analyzer": "hebrew",
+            #             }
+            #         }
+            #     }
+            # ]
         })
         mapping.generate_from_schema(schema)
         return mapping.get_mapping()

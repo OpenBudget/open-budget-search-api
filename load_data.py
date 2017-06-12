@@ -28,6 +28,24 @@ def create_index():
                 "index": {
                     "number_of_shards": 6,
                     "number_of_replicas": 1
+                },
+                "analysis.analyzer": {
+                    "default": {
+                        "type": "hebrew"
+                    },
+                },
+                "mappings": {
+                    "_default_": {
+                        "dynamic_templates": [{
+                            "strings": {
+                                "match": "*",
+                                "match_mapping_type": "text",
+                                "mapping": {
+                                    "analyzer": "hebrew",
+                                }
+                            }
+                        }]
+                    }
                 }
             }
         })
@@ -54,7 +72,7 @@ def initialize_db(arg=None):
                 create_index()
                 ds.put_mapping(es)
                 to_load.append(ds)
-        it = itertools.zip_longest(ds.load(es, revision) for ds in to_load)
+        it = itertools.zip_longest(*(ds.load(es, revision) for ds in to_load))
         collections.deque(it, maxlen=0)
 
 
