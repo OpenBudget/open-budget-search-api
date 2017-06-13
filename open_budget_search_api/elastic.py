@@ -15,7 +15,9 @@ def prepare_typed_query(type_name, term, from_date, to_date, search_size, offset
                         "query": {
                             "multi_match": {
                                 "query": term,
-                                "fields": ds.search_fields
+                                "fields": ds.search_fields,
+                                "type": "most_fields",
+                                "operator": "and"
                             }
                         },
                         "script_score": {
