@@ -7,6 +7,7 @@ class MappingGenerator(object):
 
     def __init__(self, base={}):
         self._mapping = base
+        self._search_fields = []
 
     @classmethod
     def _convert_date_format(cls, fmt):
@@ -26,12 +27,12 @@ class MappingGenerator(object):
             return 'strict_date_optional_time'
 
     @classmethod
-    def _convert_field(cls, field):
+    def _convert_field(cls, field, search_fields, prefix):
         schema_type = field['type']
         if schema_type == 'array':
             field = copy(field)
             field['type'] = field['es:itemType']
-            return cls._convert_field(field)
+            return cls._convert_field(field, search_fields, prefix)
         enabled = field.get('es:index', True)
         subschema = {'fields': []}
         if enabled and schema_type == 'object':
@@ -53,24 +54,32 @@ class MappingGenerator(object):
                          {"ignore_malformed": True,
                           "format": cls._convert_date_format(field.get('format'))}),
             "object": (None,
-                       {"properties": cls._update_properties({}, subschema) if enabled else {},
+                       {"properties":
+                            cls._update_properties({}, subschema, search_fields, prefix + field['name'] + '.')
+                            if enabled else {},
                         "enabled": enabled,
                         "dynamic": False})
         }[schema_type]
         if converted_type is not None:
             prop['type'] = converted_type
+        if converted_type == 'text':
+            search_fields.append(prefix + field['name'])
         return field['name'], prop
 
     @classmethod
-    def _update_properties(cls, properties, schema):
+    def _update_properties(cls, properties, schema, search_fields, prefix=''):
         fields = schema['fields']
-        properties.update(dict(cls._convert_field(f) for f in fields))
+        properties.update(dict(cls._convert_field(f, search_fields, prefix) for f in fields))
         return properties
 
     def generate_from_schema(self, schema):
         properties = {}
+        self._search_fields = []
         self._mapping['properties'] = properties
-        self._update_properties(properties, schema)
+        self._update_properties(properties, schema, self._search_fields)
 
     def get_mapping(self):
         return self._mapping
+
+    def get_search_fields(self):
+        return self._search_fields

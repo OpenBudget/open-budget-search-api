@@ -16,9 +16,6 @@ class DataSource(object):
         self._schema = descriptor['schema']
         fields = self._schema['fields']
 
-        self.search_fields = [field['name']
-                              for field in fields
-                              if field['type'] == 'string']
         self.keys = self._schema['primaryKey']
         if isinstance(self.keys, str):
             self.keys = [self.keys]
@@ -32,51 +29,18 @@ class DataSource(object):
                     self.range_structure.setdefault(field['name'], {})[operator] = range_kw + '_date'
         self.is_temporal = False  # len(self.date_fields) > 0
 
-        # sort_fields = sorted(
-        #     filter(lambda f: 'search:sort-order' in f, fields),
-        #     key=lambda f: f['search:sort-order']
-        # )
-        # self.sort_method = [
-        #     {
-        #         field['name']: {
-        #             'order': field['search:sort-direction']
-        #         }
-        #     }
-        #     for field in sort_fields
-        # ]
         try:
             self.scoring_column = next(iter(
                 filter(lambda f: 'es:score-column' in f, fields),
             ))['name']
         except StopIteration:
             self.scoring_column = '<none>'
-        self._mapping = None
+        self._mapping_generator = MappingGenerator()
+        self.mapping, self.search_fields = self.build_mapping(self._schema)
 
-    @property
-    def mapping(self):
-        if self._mapping is None:
-            self._mapping = self.build_mapping(self._schema)
-        return self._mapping
-
-    @staticmethod
-    def build_mapping(schema):
-        mapping = MappingGenerator({
-            # Setting the default analyzer to hebrew
-            # "dynamic_templates": [
-            #     {
-            #         "strings": {
-            #             "match": "*",
-            #             "match_mapping_type": "text",
-            #             "mapping": {
-            #                 "type": "text",
-            #                 "analyzer": "hebrew",
-            #             }
-            #         }
-            #     }
-            # ]
-        })
-        mapping.generate_from_schema(schema)
-        return mapping.get_mapping()
+    def build_mapping(self, schema):
+        self._mapping_generator.generate_from_schema(schema)
+        return self._mapping_generator.get_mapping(), self._mapping_generator.get_search_fields()
 
     def put_mapping(self, es):
         es.indices.put_mapping(index=INDEX_NAME, doc_type=self.type_name, body=self.mapping)

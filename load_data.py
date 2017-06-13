@@ -3,6 +3,7 @@ import itertools
 import collections
 import sys
 import time
+import json
 
 from open_budget_search_api.logger import logger
 from open_budget_search_api.config import INDEX_NAME, get_es_client
@@ -69,6 +70,8 @@ def initialize_db(arg=None):
         for type_name, ds in all_sources.items():
             if arg == 'all' or arg == type_name:
                 logger.info('LOADING DATA for %s', type_name)
+                logger.info('SEARCH FIELDS for %s: %r', type_name, ds.search_fields)
+                logger.info('MAPPING for %s:\n%s', type_name, json.dumps(ds.mapping, indent=2))
                 create_index()
                 ds.put_mapping(es)
                 to_load.append(ds)
