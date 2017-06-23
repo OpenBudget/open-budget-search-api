@@ -12,6 +12,7 @@ ES_SERVERS_LIST = [ES_HOST]
 DEFAULT_TIMEOUT = 60
 
 SEARCHABLE_DATAPACKAGES = [
+    "http://next.obudget.org/datapackages/procurement/tenders/exemptions/processed/datapackage.json",
     "http://next.obudget.org/datapackages/entities/scored/datapackage.json",
     "http://next.obudget.org/datapackages/budget/national/processed/connected-items/datapackage.json",
     "http://next.obudget.org/datapackages/procurement/spending/latest-contract-spending/datapackage.json",
