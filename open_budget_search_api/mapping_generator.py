@@ -5,7 +5,9 @@ from .logger import logger
 
 class MappingGenerator(object):
 
-    def __init__(self, base={}):
+    def __init__(self, base=None):
+        if base is None:
+            base = {}
         self._mapping = base
         self._search_fields = []
 
