@@ -1,7 +1,6 @@
 import json
 import re
 import elasticsearch
-import gevent
 
 from .data_sources import sources
 from .config import INDEX_NAME, get_es_client
@@ -11,53 +10,53 @@ from .logger import logger
 def prepare_typed_query(type_name, term, from_date, to_date, search_size, offset):
     ds = sources[type_name]
     body = {
+        "query": {
+            "function_score": {
                 "query": {
-                    "function_score": {
-                        "query": {
-                            "multi_match": {
-                                "query": term,
-                                "fields": ds.search_fields,
-                                "type": "most_fields",
-                                "operator": "and"
+                    "multi_match": {
+                        "query": term,
+                        "fields": ds.search_fields,
+                        "type": "most_fields",
+                        "operator": "and"
+                    }
+                },
+                "script_score": {
+                    "script": {
+                        "lang": "painless",
+                        "inline": "_score * doc['%s'].value" % ds.scoring_column
+                    }
+                }
+            }
+        },
+        "aggs": {
+            "filtered": {
+                "filter": {
+                    "bool": {
+                        "must": [
+                            {
+                                "type": {
+                                    "value": type_name
+                                }
                             }
-                        },
-                        "script_score": {
-                            "script": {
-                                "lang": "painless",
-                                "inline": "_score * doc['%s'].value" % ds.scoring_column
-                            }
-                        }
+                        ]
                     }
                 },
                 "aggs": {
-                    "filtered": {
-                        "filter": {
-                            "bool": {
-                                "must": [
-                                    {
-                                        "type": {
-                                            "value": type_name
-                                        }
-                                    }
-                                ]
-                            }
-                        },
-                        "aggs": {
-                            "top_results": {
-                                "top_hits": {
-                                    "size": int(search_size),
-                                    "from": int(offset),
-                                    "highlight": {
-                                        "fields": {
-                                            "*": {}
-                                        }
-                                    }
+                    "top_results": {
+                        "top_hits": {
+                            "size": int(search_size),
+                            "from": int(offset),
+                            "highlight": {
+                                "fields": {
+                                    "*": {}
                                 }
                             }
                         }
                     }
-                },
-                "size": 0
+                }
+            }
+        },
+        "size": 0
     }
 
     must = body["aggs"]["filtered"]["filter"]["bool"]["must"]
@@ -104,14 +103,11 @@ def get_document(type_name, doc_id):
         return None
 
 
-def query(type_name, term, from_date, to_date, size, offset):
+def multi_query(query_list):
     es = get_es_client()
-    query_body = prepare_typed_query(type_name, term, from_date, to_date, size, offset)
-    logger.info('Running QUERY:\n%s', json.dumps(query_body, indent=2, sort_keys=True))
-    res = {'es': es.search(index=INDEX_NAME,body=query_body),
-           'type_name': type_name,
-           'ds': sources[type_name]}
-    return res
+    query_list = '\n'.join(json.dumps(l) for l in query_list)
+    logger.info('Running QUERY:\n%s', query_list)
+    return es.msearch(query_list)
 
 
 def search(types, term, from_date, to_date, size, offset):
@@ -120,16 +116,24 @@ def search(types, term, from_date, to_date, size, offset):
     if 'all' in types:
         types = sources.keys()
 
+    heads = []
     query_list = []
     for type_name in types:
         if type_name not in sources:
             return {"message": "not a real type %s" % type_name}
+        head = {'index': INDEX_NAME, 'type': type_name}
+        heads.append(head)
+        query = prepare_typed_query(type_name, term, from_date, to_date, size, offset)
+        query_list.extend([head, query])
 
-        query_list.append(gevent.spawn(query, type_name, term, from_date, to_date, size, offset))
-
-    gevent.joinall(query_list)
-    values = [q.value for q in query_list]
-    elastic_result = {q['type_name']: q for q in values}
+    results = multi_query(query_list)
+    elastic_result = dict(
+        (h['type'], {
+            'ds': sources.get(h['type']),
+            'es': r
+        })
+        for h, r in zip(heads, results['responses'])
+    )
     for type_name in types:
         ret_val[type_name] = {}
         if elastic_result[type_name]['ds'].is_temporal:

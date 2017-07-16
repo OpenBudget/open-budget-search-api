@@ -16,7 +16,11 @@ class DataSource(object):
         self._schema = descriptor['schema']
         fields = self._schema['fields']
 
-        self.keys = self._schema['primaryKey']
+        try:
+            self.keys = self._schema['primaryKey']
+        except KeyError:
+            logger.exception('Failed to load %s', dp_url)
+            raise
         if isinstance(self.keys, str):
             self.keys = [self.keys]
 
@@ -36,7 +40,11 @@ class DataSource(object):
         except StopIteration:
             self.scoring_column = '<none>'
         self._mapping_generator = MappingGenerator()
-        self.mapping, self.search_fields = self.build_mapping(self._schema)
+        try:
+            self.mapping, self.search_fields = self.build_mapping(self._schema)
+        except:
+            logger.exception('Failed to load %s', dp_url)
+            raise
 
     def build_mapping(self, schema):
         self._mapping_generator.generate_from_schema(schema)
