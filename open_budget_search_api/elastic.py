@@ -7,15 +7,16 @@ from .config import INDEX_NAME, get_es_client
 from .logger import logger
 
 
-def prepare_typed_query(type_name, term, from_date, to_date, search_size, offset):
-    ds = sources[type_name]
+def prepare_typed_query(type_names, term, from_date, to_date, search_size, offset):
+    search_fields = [sources[type_name].search_fields for type_name in type_names]
+    search_fields = list(set().union(*search_fields))
     body = {
         "query": {
             "function_score": {
                 "query": {
                     "multi_match": {
                         "query": term,
-                        "fields": ds.search_fields,
+                        "fields": search_fields,
                         "type": "most_fields",
                         "operator": "and"
                     }
@@ -23,44 +24,31 @@ def prepare_typed_query(type_name, term, from_date, to_date, search_size, offset
                 "script_score": {
                     "script": {
                         "lang": "painless",
-                        "inline": "_score * doc['%s'].value" % ds.scoring_column
+                        "inline": "_score * doc['score'].value"
                     }
                 }
             }
         },
         "aggs": {
-            "filtered": {
-                "filter": {
-                    "bool": {
-                        "must": [
-                            {
-                                "type": {
-                                    "value": type_name
-                                }
-                            }
-                        ]
-                    }
-                },
-                "aggs": {
-                    "top_results": {
-                        "top_hits": {
-                            "size": int(search_size),
-                            "from": int(offset),
-                            "highlight": {
-                                "fields": {
-                                    "*": {}
-                                }
-                            }
+            "top_results": {
+                "top_hits": {
+                    "size": int(search_size),
+                    "from": int(offset),
+                    "highlight": {
+                        "fields": {
+                            "*": {}
                         }
                     }
                 }
+            },
+            "type_totals" : {
+                "terms" : { "field" : "_type" }
             }
         },
         "size": 0
     }
 
-    must = body["aggs"]["filtered"]["filter"]["bool"]["must"]
-    if ds.is_temporal:
+    if False:#ds.is_temporal:
         body["aggs"]["stats_per_month"] = {
             "date_histogram": {
                 "field": ds.date_fields['from'],
@@ -71,9 +59,10 @@ def prepare_typed_query(type_name, term, from_date, to_date, search_size, offset
         range_obj = ds.range_structure
         range_obj[ds.date_fields['from']]["gte"] = from_date
         range_obj[ds.date_fields['to']]["lte"] = to_date
-        must.append({
+        bool_filter = body["aggs"]["filtered"]["filter"]["bool"]
+        bool_filter["must"] = [{
             "range": range_obj
-        })
+        }]
     return body
 
 
@@ -103,52 +92,32 @@ def get_document(type_name, doc_id):
         return None
 
 
-def multi_query(query_list):
-    es = get_es_client()
-    query_list = '\n'.join(json.dumps(l) for l in query_list)
-    logger.info('Running QUERY:\n%s', query_list)
-    return es.msearch(query_list)
-
-
 def search(types, term, from_date, to_date, size, offset):
-
     ret_val = {}
     if 'all' in types:
         types = sources.keys()
 
-    heads = []
-    query_list = []
     for type_name in types:
         if type_name not in sources:
             return {"message": "not a real type %s" % type_name}
-        head = {'index': INDEX_NAME, 'type': type_name}
-        heads.append(head)
-        query = prepare_typed_query(type_name, term, from_date, to_date, size, offset)
-        query_list.extend([head, query])
-
-    results = multi_query(query_list)
-    elastic_result = dict(
-        (h['type'], {
-            'ds': sources.get(h['type']),
-            'es': r
-        })
-        for h, r in zip(heads, results['responses'])
+    query = prepare_typed_query(types, term, from_date, to_date, size, offset)
+    results = get_es_client().search(index=INDEX_NAME, doc_type=",".join(types), body=query)
+    overalls = results['aggregations']['type_totals']['buckets']
+    overalls = dict(
+        (i['key'], i['doc_count'])
+        for i in overalls
     )
+
     for type_name in types:
-        ret_val[type_name] = {}
-        if elastic_result[type_name]['ds'].is_temporal:
-            ret_val[type_name]["total_in_result"] = \
-                len(elastic_result[type_name]['es']["aggregations"]["filtered"]["top_results"]["hits"]["hits"])
-            ret_val[type_name]["data_time_distribution"] = \
-                elastic_result[type_name]['es']["aggregations"]["stats_per_month"]["buckets"]
-
-        ret_val[type_name]["total_overall"] = elastic_result[type_name]['es']["hits"]["total"]
-        ret_val[type_name]["docs"] = []
-
-        for doc in elastic_result[type_name]['es']["aggregations"]["filtered"]["top_results"]["hits"]["hits"]:
-            rec = {'source': doc["_source"],
-                   'highlight': parse_highlights(doc["highlight"])}
-            ret_val[type_name]["docs"].append(rec)
+        ret_val[type_name] = {
+            'total_overall': overalls.get(type_name, 0),
+            'docs': []
+        }
+    for hit in results['aggregations']['top_results']['hits']['hits']:
+        ret_val[hit['_type']]['docs'].append({
+            'source': hit['_source'],
+            'highlight': parse_highlights(hit['highlight'])
+        })
 
     return ret_val
 
