@@ -88,7 +88,10 @@ def get_document(type_name, doc_id):
 
 
 def search(types, term, from_date, to_date, size, offset):
-    ret_val = {}
+    ret_val = {
+        'search_counts': {},
+        'search_results': [],
+    }
     if 'all' in types:
         types = sources.keys()
 
@@ -104,14 +107,14 @@ def search(types, term, from_date, to_date, size, offset):
     )
 
     for type_name in types:
-        ret_val[type_name] = {
+        ret_val['search_counts'][type_name.replace('-', '')] = {
             'total_overall': overalls.get(type_name, 0),
-            'docs': []
         }
     for hit in results['hits']['hits']:
-        ret_val[hit['_type']]['docs'].append({
+        ret_val['search_results'].append({
             'source': hit['_source'],
-            'highlight': parse_highlights(hit['highlight'])
+            'highlight': parse_highlights(hit['highlight']),
+            'type': hit['_type'].replace('-', ''),
         })
 
     return ret_val
