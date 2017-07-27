@@ -30,22 +30,17 @@ def prepare_typed_query(type_names, term, from_date, to_date, search_size, offse
             }
         },
         "aggs": {
-            "top_results": {
-                "top_hits": {
-                    "size": int(search_size),
-                    "from": int(offset),
-                    "highlight": {
-                        "fields": {
-                            "*": {}
-                        }
-                    }
-                }
-            },
             "type_totals" : {
                 "terms" : { "field" : "_type" }
             }
         },
-        "size": 0
+        "size": int(search_size),
+        "from": int(offset),
+        "highlight": {
+            "fields": {
+                "*": {}
+            }
+        }
     }
 
     if False:#ds.is_temporal:
@@ -113,7 +108,7 @@ def search(types, term, from_date, to_date, size, offset):
             'total_overall': overalls.get(type_name, 0),
             'docs': []
         }
-    for hit in results['aggregations']['top_results']['hits']['hits']:
+    for hit in results['hits']['hits']:
         ret_val[hit['_type']]['docs'].append({
             'source': hit['_source'],
             'highlight': parse_highlights(hit['highlight'])
