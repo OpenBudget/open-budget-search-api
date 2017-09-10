@@ -12,19 +12,19 @@ from open_budget_search_api.data_sources import all_sources
 csv.field_size_limit(500*1024)
 
 
-def clean():
+def clean(index_name=INDEX_NAME):
     es = get_es_client()
-    if es.indices.exists(INDEX_NAME):
-        logger.info("Removing INDEX %s", INDEX_NAME)
-        es.indices.delete(INDEX_NAME)
+    if es.indices.exists(index_name):
+        logger.info("Removing INDEX %s", index_name)
+        es.indices.delete(index_name)
         es.indices.flush()
 
 
-def create_index():
+def create_index(index_name=INDEX_NAME):
     es = get_es_client()
-    if not es.indices.exists(INDEX_NAME):
-        logger.info("Creating INDEX %s", INDEX_NAME)
-        es.indices.create(INDEX_NAME, {
+    if not es.indices.exists(index_name):
+        logger.info("Creating INDEX %s", index_name)
+        es.indices.create(index_name, {
             "settings": {
                 "index": {
                     "number_of_shards": 6,
@@ -50,14 +50,14 @@ def create_index():
             #     }
             # }
         })
-        es.indices.flush(INDEX_NAME)
+        es.indices.flush(index_name)
 
 
-def initialize_db(arg=None):
+def initialize_db(arg=None, index_name=INDEX_NAME):
     if arg == "clean":
         logger.info('CLEANING UP')
-        clean()
-        create_index()
+        clean(index_name=index_name)
+        create_index(index_name=index_name)
     elif arg is None:
         print("Usage:")
         print("Option 1: " + sys.argv[0] + " all")
@@ -72,10 +72,10 @@ def initialize_db(arg=None):
                 logger.info('LOADING DATA for %s', type_name)
                 logger.info('SEARCH FIELDS for %s: %r', type_name, ds.search_fields)
                 logger.info('MAPPING for %s:\n%s', type_name, json.dumps(ds.mapping, indent=2))
-                create_index()
-                ds.put_mapping(es)
+                create_index(index_name=index_name)
+                ds.put_mapping(es, index=index_name)
                 to_load.append(ds)
-        it = itertools.zip_longest(*(ds.load(es, revision) for ds in to_load))
+        it = itertools.zip_longest(*(ds.load(es, revision, index_name=index_name) for ds in to_load))
         collections.deque(it, maxlen=0)
 
 

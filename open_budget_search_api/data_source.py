@@ -1,6 +1,7 @@
 from datapackage import DataPackage
+from elasticsearch import helpers
 
-from .config import INDEX_NAME
+from .config import INDEX_NAME, LOAD_DATA_BULK_INDEX_BATCH, LOAD_DATA_LOG_EVERY
 from .logger import logger
 from .mapping_generator import MappingGenerator
 
@@ -50,21 +51,38 @@ class DataSource(object):
         self._mapping_generator.generate_from_schema(schema)
         return self._mapping_generator.get_mapping(), self._mapping_generator.get_search_fields()
 
-    def put_mapping(self, es):
-        es.indices.put_mapping(index=INDEX_NAME, doc_type=self.type_name, body=self.mapping)
+    def put_mapping(self, es, index=INDEX_NAME):
+        es.indices.put_mapping(index=index, doc_type=self.type_name, body=self.mapping)
 
-    def load(self, es, revision=None):
+    def bulk_index_flush(self, es):
+        if len(self.bulk_index_actions) >= LOAD_DATA_BULK_INDEX_BATCH:
+            success, errors = helpers.bulk(es, self.bulk_index_actions)
+            if not success:
+                logger.error("Failed to index %s", self.type_name)
+                logger.info(errors)
+            yield from (action["_id"] for action in self.bulk_index_actions)
+            self.bulk_index_actions = []
+
+    def load(self, es, revision=None, index_name=INDEX_NAME):
+        self.bulk_index_actions = []
         try:
+            i = 0
             for i, doc in enumerate(self.resource.iter()):
-                if i % 10000 == 0:
-                    logger.info('LOADING %s: %s rows', self.type_name, i)
+                if i == 0:
+                    logger.info('START LOADING %s', self.type_name)
+                if i % LOAD_DATA_LOG_EVERY == 0:
+                    logger.info('LOADING %s: %s rows loaded', self.type_name, i)
                 doc_id = ":".join(str(doc.get(k)) for k in self.keys)
                 if revision is not None:
                     doc['revision'] = revision
-                try:
-                    es.index(INDEX_NAME, self.type_name, doc, id=doc_id)
-                except Exception:
-                    logger.exception("Failed to index %s row %s: %r", self.type_name, doc_id, doc)
-                yield doc_id
+                self.bulk_index_actions.append({
+                    "_index": index_name,
+                    "_type": self.type_name,
+                    "_id": doc_id,
+                    "_source": doc
+                })
+                yield from self.bulk_index_flush(es)
+            yield from self.bulk_index_flush(es)
+            logger.info('FINISHED LOADING %s, loaded %s rows', self.type_name, i)
         except Exception:
             logger.exception("Failed to load %s", self.type_name)

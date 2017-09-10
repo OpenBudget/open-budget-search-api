@@ -7,7 +7,7 @@ ES_PORT = os.environ.get('ES_PORT', '9200')
 es_connection_string = '{}:{}'\
     .format(ES_HOST, ES_PORT)
 
-INDEX_NAME = 'obudget'
+INDEX_NAME = os.environ.get("OBUDGET_INDEX_NAME", 'obudget')
 ES_SERVERS_LIST = [es_connection_string]
 DEFAULT_TIMEOUT = 60
 
@@ -23,6 +23,9 @@ SEARCHABLE_DATAPACKAGES = [
 NON_SEARCHABLE_DATAPACKAGES = [
     'http://next.obudget.org/datapackages/budgetkey/documents/datapackage.json',
 ]
+
+LOAD_DATA_LOG_EVERY = int(os.environ.get("LOAD_DATA_LOG_EVERY", "10000"))
+LOAD_DATA_BULK_INDEX_BATCH = int(os.environ.get("LOAD_DATA_BULK_INDEX_BATCH", "500"))
 
 _es = None
 
