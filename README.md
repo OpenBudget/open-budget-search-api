@@ -15,3 +15,10 @@ The api server should be available at http://localhost:18000/
 * for example:
   * http://localhost:18000/search/exemptions/web/2000-01-01/2019-01-01/4/0
 
+### Contributing
+
+* You should be inside an activated Python 3.6 virtualenv
+* `cp .env.example .env`
+* `pip install -r requirements.txt`
+* `source .env`
+* `python3 load_data.py all`

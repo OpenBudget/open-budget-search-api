@@ -8,7 +8,7 @@ es_connection_string = '{}:{}'\
     .format(ES_HOST, ES_PORT)
 
 INDEX_NAME = 'obudget'
-ES_SERVERS_LIST = [ES_HOST]
+ES_SERVERS_LIST = [es_connection_string]
 DEFAULT_TIMEOUT = 60
 
 SEARCHABLE_DATAPACKAGES = [
