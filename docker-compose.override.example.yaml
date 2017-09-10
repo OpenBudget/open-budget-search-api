@@ -1,0 +1,19 @@
+version: '3.2'
+
+services:
+
+  # elasticsearch
+  es:
+    image: budgetkey/open-budget-elasticsearch
+
+  # default api configuration: uses the docker compose es
+  # expose on port 18000 (to reduce chance of port collisions)
+  api:
+    depends_on:
+      - es
+    build: .
+    environment:
+      ES_HOST: es
+      ES_PORT: 9200
+    ports:
+      - "18000:8000"
