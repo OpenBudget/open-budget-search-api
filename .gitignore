@@ -93,3 +93,4 @@ ENV/
 .gitignore
 .idea/
 open-budget-search-api.iml
+docker-compose.override.yaml

@@ -1,76 +1,32 @@
-open-budget-search-api
-======================
+# open-budget-search-api
 
-Install:
+### Installation
 
-	Elasticsearch part
+* Install Docker and Docker Compose (refer to Docker documentation)
+* `cp docker-compose.override.example.yaml docker-compose.override.yaml`
+* `docker-compose pull`
+* `docker-compose up`
 
-		On windows:
+The api server should be available at http://localhost:18000/
 
-		1. Download elasticsearch 1.7.0 from:
-		https://www.elastic.co/downloads/past-releases/elasticsearch-1-7-0
-		2. Go to the bin direcotry and execture:
-		plugin --install analysis-hebrew --url https://bintray.com/artifact/download/synhershko/elasticsearch-analysis-hebrew/elasticsearch-analysis-hebrew-1.7.zip
-		3. download all the hebrew data files from:
-		https://github.com/synhershko/HebMorph/tree/master/hspell-data-files
+### Usage
 
-		into plugins/analysis-hebrew/hspell-data-files
+* `/search/<COMMA_SEPARATED_TABLE_NAMES>/<SEARCH_TERM>/<FROM_DATE>/<TO_DATE>/<MAXIMUM_SIZE_OF_RESULT>/<OFFSET>`
+* for example:
+  * http://localhost:18000/search/exemptions/web/2000-01-01/2019-01-01/4/0
 
-		4. Go to config\elasticsearch.yml and add at the buttom the following line:
-		hebrew.dict.path: FULL/PATH/TO/HSPELL-DATA-FILES
-		for example:
-		hebrew.dict.path: C:\dev\elasticsearch-1.7.0\hspell-data-files\
+### Contributing
 
-		5. Now start elasticsearch bin\elasticsearch.bat, and via your browser test the plugin by going to :
-		http://localhost:9200/_hebrew/check-word/áãé÷ä
-
-		If it loads, it means everything is set up and you are good to go.
-
-		6. If something in one of the steps is not working you may find help over elasticsearch website and 
-		the hebrew plugin github repository.
-
-
-		On Linux:
-
-		1. Download latest elasticsearch version
-		2. Go to the bin direcotry and execute:
-		plugin install https://bintray.com/synhershko/elasticsearch-analysis-hebrew/download_file?file_path=elasticsearch-analysis-hebrew-2.3.4.zip
-		3. download all the hebrew data files from:
-		https://github.com/synhershko/HebMorph/tree/master/hspell-data-files
-
-		into plugins/analysis-hebrew/hspell-data-files
-
-		4. Go to config\elasticsearch.yml and add at the buttom the following line:
-		hebrew.dict.path: FULL/PATH/TO/HSPELL-DATA-FILES
-		for example:
-		hebrew.dict.path: /tmp/hspell-data-files/
-
-		5. Now start elasticsearch bin\elasticsearch.bat, and via your browser test the plugin by going to :
-		http://localhost:9200/_hebrew/check-word/áãé÷ä
-
-		If it loads, it means everything is set up and you are good to go.
-
-		6. If something in one of the steps is not working you may find help over elasticsearch website and 
-		the hebrew plugin github repository.
-	
-
-	run:
-
-	open-budget-search-api part:
-		
-		1. Run init_db.py - This will load all of the tables that are under data/ directory
-		The following tables are to be expected to be there:
-			exemption, budget, supports, changes, type_name (change_history can also be put there). There rest
-			of the tables will be ignored
-		2. Run main.py -  This module start listening to requests of the following structure:
-		http://localhost:5000/search/comma_seperated_table_names/search_term/from_data/to_date/maxinum_size_of_result/offset
-		for example
-		http://localhost:5000/search/exemption/test/2000-01-01/2019-01-01/4/0
-		3. There is a log for exceptions called obudget.log which is written right next to the main.py and/or init_db
-		
-		
-		
-	
-	
-	
-	
+* Installing the development environment
+  * You should be inside an activated Python 3.6 virtualenv
+  * `cp .env.example .env`
+  * `pip install -r requirements.txt`
+  * `pip install -e .[develop]`
+  * `source .env`
+* Run the load_data script - which loads data to elasticsearch
+  * `python3 load_data.py all`
+* Run the tests
+  * Using tox
+    * `tox`
+  * Calling pytest directly
+    * `py.test tests/`

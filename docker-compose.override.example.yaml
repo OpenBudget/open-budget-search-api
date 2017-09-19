@@ -1,0 +1,30 @@
+version: '3.2'
+
+# you should copy this file to docker-compose.override.yaml - it will be picked up automatically by docker-compose
+# ports are exposed with prefix of 1 - to reduce chance of port collisions with host services
+
+services:
+
+  elasticsearch:
+    image: budgetkey/open-budget-elasticsearch
+    ports:
+      - "19200:9200"
+
+  api:
+    depends_on:
+      - elasticsearch
+    build: .
+    environment:
+      ES_HOST: elasticsearch
+      ES_PORT: 9200
+    ports:
+      - "18000:8000"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:5.3.0
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200/
+    depends_on:
+      - elasticsearch
+    ports:
+     - "15601:5601"

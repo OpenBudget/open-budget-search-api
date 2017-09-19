@@ -1,0 +1,9 @@
+version: '3.2'
+
+# this file should be kept minimal - with only the required configuration common to all environments
+# most configuration / services setup should be done in the docker-compose.override file
+
+services:
+
+  api:
+    image: budgetkey/open-budget-search-api
