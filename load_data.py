@@ -7,7 +7,6 @@ import json
 
 from open_budget_search_api.logger import logger
 from open_budget_search_api.config import INDEX_NAME, get_es_client
-from open_budget_search_api.data_sources import all_sources
 
 csv.field_size_limit(500*1024)
 
@@ -67,6 +66,10 @@ def initialize_db(arg=None, index_name=INDEX_NAME):
         revision = int(time.time())
         es = get_es_client()
         to_load = []
+        # this import causes loading of the datapackage sources
+        # which causes unnecesarry delay in importing that is only needed for this part
+        # TODO: perhaps change it to get_all_sources function instead
+        from open_budget_search_api.data_sources import all_sources
         for type_name, ds in all_sources.items():
             if arg == 'all' or arg == type_name:
                 logger.info('LOADING DATA for %s', type_name)
