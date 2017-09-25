@@ -79,8 +79,25 @@ def parse_highlights(highlights):
 
 
 def merge_highlight_into_source(source, highlights):
-    if 'title' in highlights and 'title' in source:
-        source['title'] = highlights['title']
+    for field in highlights:
+        if '.' in field:
+            field_parts = field.split('.')
+            if field_parts[0] in source:
+                if len(source[field_parts[0]]) == 1 :
+                    if field_parts[1] in source[field_parts[0]]:
+                        source[field_parts[0]] = highlights[field]
+                else:
+                    for h in highlights[field]:
+                        h_raw = h.replace('em', '').replace('<', '').replace('>','').replace('/','')
+                        for i, s in enumerate(source[field_parts[0]]):
+                            if h_raw in s[field_parts[1]]:
+                                source[field_parts[0]][i][field_parts[1]] = h
+                                break
+
+        elif field in source:
+            source[field] = highlights[field]
+        else:
+            pass
     return source
 
 
