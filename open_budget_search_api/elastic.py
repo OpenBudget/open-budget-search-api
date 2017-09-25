@@ -83,19 +83,19 @@ def merge_highlight_into_source(source, highlights):
         if '.' in field:
             field_parts = field.split('.')
             if field_parts[0] in source:
-                if len(source[field_parts[0]]) == 1 :
-                    if field_parts[1] in source[field_parts[0]]:
-                        source[field_parts[0]] = highlights[field]
+                if len(source[field_parts[0]]) == 1:
+                    if field_parts[1] in source[field_parts[0]][0]:
+                        source[field_parts[0]][0][field_parts[1]] = highlights[field][0]
                 else:
                     for h in highlights[field]:
-                        h_raw = h.replace('em', '').replace('<', '').replace('>','').replace('/','')
+                        h_raw = h.replace('em', '').replace('<', '').replace('>', '').replace('/', '')
                         for i, s in enumerate(source[field_parts[0]]):
                             if h_raw in s[field_parts[1]]:
                                 source[field_parts[0]][i][field_parts[1]] = h
                                 break
 
         elif field in source:
-            source[field] = highlights[field]
+            source[field] = highlights[field][0]
         else:
             pass
     return source
