@@ -78,6 +78,12 @@ def parse_highlights(highlights):
     return parsed_highlights
 
 
+def merge_highlight_into_source(source, highlights):
+    if 'title' in highlights and 'title' in source:
+        source['title'] = highlights['title']
+    return source
+
+
 def get_document(type_name, doc_id):
     es = get_es_client()
     try:
@@ -112,7 +118,7 @@ def search(types, term, from_date, to_date, size, offset):
         }
     for hit in results['hits']['hits']:
         ret_val['search_results'].append({
-            'source': hit['_source'],
+            'source': merge_highlight_into_source(hit['_source'], hit['highlight']),
             'highlight': parse_highlights(hit['highlight']),
             'type': hit['_type'].replace('-', ''),
         })
