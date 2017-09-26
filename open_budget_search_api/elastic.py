@@ -61,43 +61,62 @@ def prepare_typed_query(type_names, term, from_date, to_date, search_size, offse
     return body
 
 
-def parse_highlights(highlights):
-    start_tag = '<em>'
-    end_tag = '</em>'
-    parsed_highlights = {}
-    for field in highlights:
-        parsed_highlights[field] = []
-        for term in highlights[field]:
-            start_tag_results = re.finditer(start_tag, term)
-            end_tag_results = re.finditer(end_tag, term)
-            for start, end in zip(start_tag_results, end_tag_results):
-                    result_index = start.end() - len(start_tag)
-                    result_len = end.start() - start.end()
-                    parsed_highlights[field].append([result_index, result_len])
+# def parse_highlights(highlights):
+#     start_tag = '<em>'
+#     end_tag = '</em>'
+#     parsed_highlights = {}
+#     for field in highlights:
+#         parsed_highlights[field] = []
+#         for term in highlights[field]:
+#             start_tag_results = re.finditer(start_tag, term)
+#             end_tag_results = re.finditer(end_tag, term)
+#             for start, end in zip(start_tag_results, end_tag_results):
+#                     result_index = start.end() - len(start_tag)
+#                     result_len = end.start() - start.end()
+#                     parsed_highlights[field].append([result_index, result_len])
+#
+#     return parsed_highlights
+#
 
-    return parsed_highlights
+def prepare_replacements(highlighted):
+    return [
+        (h.replace('<em>', '').replace('</em>', ''), h)
+        for h in highlighted
+    ]
+
+
+def do_replacements(value, replacements):
+    if value is None:
+        return None
+
+    if isinstance(value, str):
+        for src, dst in replacements:
+            value = value.replace(src, dst)
+        return value
+
+    if isinstance(value, (int, bool)):
+        return value
+
+    if isinstance(value, list):
+        return [do_replacements(v, replacements) for v in value]
+
+    if isinstance(value, dict):
+        return dict((k, do_replacements(v, replacements)) for k, v in value.items())
+
+    assert False, 'Unknown type %r' % value
 
 
 def merge_highlight_into_source(source, highlights):
-    for field in highlights:
-        if '.' in field:
-            field_parts = field.split('.')
-            if field_parts[0] in source:
-                if len(source[field_parts[0]]) == 1:
-                    if field_parts[1] in source[field_parts[0]][0]:
-                        source[field_parts[0]][0][field_parts[1]] = highlights[field][0]
-                else:
-                    for h in highlights[field]:
-                        h_raw = h.replace('em', '').replace('<', '').replace('>', '').replace('/', '')
-                        for i, s in enumerate(source[field_parts[0]]):
-                            if h_raw in s[field_parts[1]]:
-                                source[field_parts[0]][i][field_parts[1]] = h
-                                break
+    for field, highlighted in highlights.items():
+        highlighted = prepare_replacements(highlighted)
+        field_parts = field.split('.')
+        src = source
+        while len(field_parts) > 1:
+            part = field_parts.pop(0)
+            src = src[part]
+        field = field_parts[0]
 
-        elif field in source:
-            source[field] = highlights[field][0]
-        else:
-            pass
+        src[field] = do_replacements(src[field], highlighted)
     return source
 
 
@@ -136,7 +155,7 @@ def search(types, term, from_date, to_date, size, offset):
     for hit in results['hits']['hits']:
         ret_val['search_results'].append({
             'source': merge_highlight_into_source(hit['_source'], hit['highlight']),
-            'highlight': parse_highlights(hit['highlight']),
+            'highlight': {},
             'type': hit['_type'].replace('-', ''),
         })
 
