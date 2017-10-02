@@ -111,10 +111,14 @@ def merge_highlight_into_source(source, highlights):
         highlighted = prepare_replacements(highlighted)
         field_parts = field.split('.')
         src = source
-        while len(field_parts) > 1:
-            part = field_parts.pop(0)
-            src = src[part]
         field = field_parts[0]
+        while len(field_parts) > 1:
+            if isinstance(src[field], object):
+                field_parts.pop(0)
+                src = src[field]
+                field = field_parts[0]
+            else:
+                break
 
         src[field] = do_replacements(src[field], highlighted)
     return source
