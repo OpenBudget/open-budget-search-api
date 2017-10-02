@@ -1,8 +1,8 @@
-from flask import Flask, jsonify
+from flask import Flask
 from flask_jsonpify import jsonpify
 from flask_cors import CORS
 
-from .elastic import search, autocomplete, get_document
+from .elastic import search, get_document
 from .logger import logger
 
 app = Flask(__name__)

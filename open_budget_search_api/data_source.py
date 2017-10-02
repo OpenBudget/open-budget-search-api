@@ -42,7 +42,7 @@ class DataSource(object):
         self._mapping_generator = MappingGenerator()
         try:
             self.mapping, self.search_fields = self.build_mapping(self._schema)
-        except:
+        except: #noqa
             logger.exception('Failed to load %s', dp_url)
             raise
 

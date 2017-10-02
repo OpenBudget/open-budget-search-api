@@ -1,7 +1,5 @@
 from copy import copy
 
-from .logger import logger
-
 
 class MappingGenerator(object):
 
@@ -57,8 +55,8 @@ class MappingGenerator(object):
                           "format": cls._convert_date_format(field.get('format'))}),
             "object": (None,
                        {"properties":
-                            cls._update_properties({}, subschema, search_fields, prefix + field['name'] + '.')
-                            if enabled else {},
+                           cls._update_properties({}, subschema, search_fields, prefix + field['name'] + '.')
+                           if enabled else {},
                         "enabled": enabled,
                         "dynamic": False})
         }[schema_type]

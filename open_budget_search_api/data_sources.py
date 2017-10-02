@@ -14,7 +14,7 @@ sources = dict(
 )
 
 
-all_sources =  non_searchable_sources + searchable_sources
+all_sources = non_searchable_sources + searchable_sources
 all_sources = dict(
     (ds.type_name, ds) for ds in all_sources
 )

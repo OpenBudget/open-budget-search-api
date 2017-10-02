@@ -1,10 +1,7 @@
-import json
-import re
 import elasticsearch
 
 from .data_sources import sources
 from .config import INDEX_NAME, get_es_client
-from .logger import logger
 
 
 def prepare_typed_query(type_names, term, from_date, to_date, search_size, offset):
@@ -30,8 +27,8 @@ def prepare_typed_query(type_names, term, from_date, to_date, search_size, offse
             }
         },
         "aggs": {
-            "type_totals" : {
-                "terms" : { "field" : "_type" }
+            "type_totals": {
+                "terms": {"field": "_type"}
             }
         },
         "size": int(search_size),
@@ -43,40 +40,23 @@ def prepare_typed_query(type_names, term, from_date, to_date, search_size, offse
         }
     }
 
-    if False:#ds.is_temporal:
-        body["aggs"]["stats_per_month"] = {
-            "date_histogram": {
-                "field": ds.date_fields['from'],
-                "interval": "month",
-                "min_doc_count": 1
-            }
-        }
-        range_obj = ds.range_structure
-        range_obj[ds.date_fields['from']]["gte"] = from_date
-        range_obj[ds.date_fields['to']]["lte"] = to_date
-        bool_filter = body["aggs"]["filtered"]["filter"]["bool"]
-        bool_filter["must"] = [{
-            "range": range_obj
-        }]
+    # if False:#ds.is_temporal:
+    #     body["aggs"]["stats_per_month"] = {
+    #         "date_histogram": {
+    #             "field": ds.date_fields['from'],
+    #             "interval": "month",
+    #             "min_doc_count": 1
+    #         }
+    #     }
+    #     range_obj = ds.range_structure
+    #     range_obj[ds.date_fields['from']]["gte"] = from_date
+    #     range_obj[ds.date_fields['to']]["lte"] = to_date
+    #     bool_filter = body["aggs"]["filtered"]["filter"]["bool"]
+    #     bool_filter["must"] = [{
+    #         "range": range_obj
+    #     }]
     return body
 
-
-# def parse_highlights(highlights):
-#     start_tag = '<em>'
-#     end_tag = '</em>'
-#     parsed_highlights = {}
-#     for field in highlights:
-#         parsed_highlights[field] = []
-#         for term in highlights[field]:
-#             start_tag_results = re.finditer(start_tag, term)
-#             end_tag_results = re.finditer(end_tag, term)
-#             for start, end in zip(start_tag_results, end_tag_results):
-#                     result_index = start.end() - len(start_tag)
-#                     result_len = end.start() - start.end()
-#                     parsed_highlights[field].append([result_index, result_len])
-#
-#     return parsed_highlights
-#
 
 def prepare_replacements(highlighted):
     return [
@@ -119,7 +99,6 @@ def merge_highlight_into_source(source, highlights):
                 field = field_parts[0]
             else:
                 break
-
 
         src[field] = do_replacements(src[field], highlighted)
     return source
