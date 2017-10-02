@@ -113,12 +113,13 @@ def merge_highlight_into_source(source, highlights):
         src = source
         field = field_parts[0]
         while len(field_parts) > 1:
-            if isinstance(src[field], object):
+            if isinstance(src[field], dict):
                 field_parts.pop(0)
                 src = src[field]
                 field = field_parts[0]
             else:
                 break
+
 
         src[field] = do_replacements(src[field], highlighted)
     return source
