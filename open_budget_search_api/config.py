@@ -7,7 +7,8 @@ ES_PORT = os.environ.get('ES_PORT', '9200')
 es_connection_string = '{}:{}'\
     .format(ES_HOST, ES_PORT)
 
-INDEX_NAME = 'budgetkey'
+#INDEX_NAME = 'budgetkey'
+INDEX_NAME = 'obudget'
 ES_SERVERS_LIST = [ES_HOST]
 DEFAULT_TIMEOUT = 60
 
