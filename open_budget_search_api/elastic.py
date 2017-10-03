@@ -72,6 +72,7 @@ def do_replacements(value, replacements):
     if isinstance(value, str):
         for src, dst in replacements:
             value = value.replace(src, dst)
+        value = value.replace('</em> <em>', ' ')
         return value
 
     if isinstance(value, (int, bool)):
