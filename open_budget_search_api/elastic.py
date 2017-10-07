@@ -142,6 +142,7 @@ def search(types, term, from_date, to_date, size, offset):
             'source': merge_highlight_into_source(hit['_source'], hit['highlight']),
             'highlight': {},
             'type': hit['_type'].replace('-', ''),
+            'score': hit['_score'],
         })
 
     return ret_val
