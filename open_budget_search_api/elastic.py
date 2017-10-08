@@ -18,10 +18,10 @@ def prepare_typed_query(type_names, term, from_date, to_date, search_size, offse
                         "operator": "and"
                     }
                 },
+                "boost_mode": "multiply",
                 "script_score": {
                     "script": {
-                        "lang": "painless",
-                        "inline": "_score * doc['score'].value"
+                        "inline": "Math.log(doc['score'].value+1)"
                     }
                 }
             }
