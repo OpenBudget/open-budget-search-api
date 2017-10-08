@@ -14,7 +14,7 @@ def prepare_typed_query(type_names, term, from_date, to_date, search_size, offse
                     "multi_match": {
                         "query": term,
                         "fields": search_fields,
-                        "type": "most_fields",
+                        "type": "best_fields",
                         "operator": "and"
                     }
                 },
