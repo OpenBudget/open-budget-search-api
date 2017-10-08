@@ -63,7 +63,10 @@ class MappingGenerator(object):
         if converted_type is not None:
             prop['type'] = converted_type
         if converted_type == 'text':
-            search_fields.append(prefix + field['name'])
+            search_field = prefix + field['name']
+            if 'es:title' in field:
+                search_field += '^10'
+            search_fields.append(search_field)
         return field['name'], prop
 
     @classmethod
