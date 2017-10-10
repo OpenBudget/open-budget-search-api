@@ -12,6 +12,7 @@ def test_highlight_merge():
             'propx': 'an unrelated internal property',
             'propn': None,
             'propi': 8,
+            'propf': 8.0,
         },
         'c': [
             {'arrayprop': 'simple'},
@@ -41,6 +42,7 @@ def test_highlight_merge():
             'propx': 'an unrelated internal property',
             'propn': None,
             'propi': 8,
+            'propf': 8.0,
         },
         'c': [
             {'arrayprop': '<em>simple</em>'},

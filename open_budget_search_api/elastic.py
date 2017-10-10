@@ -75,7 +75,7 @@ def do_replacements(value, replacements):
         value = value.replace('</em> <em>', ' ')
         return value
 
-    if isinstance(value, (int, bool)):
+    if isinstance(value, (int, bool, float)):
         return value
 
     if isinstance(value, list):
