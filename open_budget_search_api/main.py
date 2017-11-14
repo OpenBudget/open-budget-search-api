@@ -1,4 +1,6 @@
+import logging
 from flask import Flask
+from flask.helpers import NotFound
 from flask_jsonpify import jsonpify
 from flask_cors import CORS
 
@@ -27,6 +29,9 @@ def search_handler(types, search_term, from_date, to_date, size, offset):
            methods=['GET'])
 def get_document_handler(doc_id):
     result = get_document('document', doc_id)
+    if result is None:
+        logging.warning('Failed to fetch document for %r', doc_id)
+        raise NotFound()
     return jsonpify(result)
 
 
