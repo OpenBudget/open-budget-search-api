@@ -6,15 +6,12 @@ RUN apk add --update --virtual=build-dependencies wget ca-certificates python3-d
 RUN apk add --update libpq libxml2 libxslt libstdc++
 RUN python3 --version
 
-COPY requirements.txt /requirements.txt
-RUN pip3 install -r /requirements.txt
-
-RUN apk del build-dependencies
-RUN rm -rf /var/cache/apk/*
-
 COPY [a-z_A-Z]* $APP_PATH/
 COPY open_budget_search_api/ $APP_PATH/open_budget_search_api/
 RUN ls -la /opt/app/
+RUN pip3 install -r $APP_PATH/requirements.txt
+RUN apk del build-dependencies
+RUN rm -rf /var/cache/apk/*
 
 USER $GUNICORN_USER
 

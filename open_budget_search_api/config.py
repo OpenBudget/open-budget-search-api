@@ -8,7 +8,7 @@ es_connection_string = '{}:{}'\
     .format(ES_HOST, ES_PORT)
 
 INDEX_NAME = os.environ.get('INDEX_NAME', 'budgetkey')
-ES_SERVERS_LIST = [{"host": ES_HOST, "port": int(ES_PORT)}]
+ES_SERVERS_LIST = [ES_HOST]
 DEFAULT_TIMEOUT = 60
 
 SEARCHABLE_DATAPACKAGES = [
