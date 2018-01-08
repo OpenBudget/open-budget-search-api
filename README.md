@@ -16,5 +16,5 @@ open-budget-search-api
 * Run main.py -  This module start listening to requests of the following structure:
   http://localhost:5000/search/comma_seperated_table_names/search_term/from_data/to_date/maxinum_size_of_result/offset
   for example - http://localhost:5000/search/exemption/test/2000-01-01/2019-01-01/4/0
-* There is a log for exceptions called obudget.log which is written right next to the main.py
+* There is a log for exceptions called obudget.log which is written right next to the main.py and/or init_db
 
