@@ -66,9 +66,7 @@ class MappingGenerator(object):
             search_field = prefix + field['name']
             to_add = [search_field]
             if 'es:title' in field or 'es:hebrew' in field:
-                to_add.append(search_field+'.hebrew')
-            if 'es:title' in field:
-                to_add = [x + '^10' for x in to_add]
+                to_add.append(search_field+'.hebrew^10')
             search_fields.extend(to_add)
         return field['name'], prop
 
