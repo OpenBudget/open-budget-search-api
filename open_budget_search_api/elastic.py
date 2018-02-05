@@ -18,10 +18,10 @@ def prepare_typed_query(type_names, term, from_date, to_date, search_size, offse
                         "operator": "and"
                     }
                 },
-                "boost_mode": "sum",
+                "boost_mode": "multiply",
                 "field_value_factor": {
                         "field": "score",
-                        "modifier": "ln1p",
+                        "modifier": "sqrt",
                         "missing": 1
                 }
             }
