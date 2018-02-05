@@ -19,10 +19,10 @@ def prepare_typed_query(type_names, term, from_date, to_date, search_size, offse
                     }
                 },
                 "boost_mode": "multiply",
-                "script_score": {
-                    "script": {
-                        "inline": "Math.log(doc['score'].value+1)"
-                    }
+                "field_value_factor": {
+                        "field": "score",
+                        "modifier": "ln1p",
+                        "missing": 1
                 }
             }
         },
