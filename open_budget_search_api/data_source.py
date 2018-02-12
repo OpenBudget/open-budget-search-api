@@ -26,12 +26,10 @@ class DataSource(object):
 
         self.date_fields = {}
         self.range_structure = {}
-        for range_kw, operator in [('from', 'gte'), ('to', 'lte')]:
-            for field in fields:
-                if range_kw in field.get('search:time-range', ''):
-                    self.date_fields[range_kw] = field['name']
-                    self.range_structure.setdefault(field['name'], {})[operator] = range_kw + '_date'
-        self.is_temporal = False  # len(self.date_fields) > 0
+
+        for field in fields:
+            if field.get("es:time-range"):
+                self.date_fields[field["es:time-range"]] = field["name"]
 
         try:
             self.scoring_column = next(iter(
