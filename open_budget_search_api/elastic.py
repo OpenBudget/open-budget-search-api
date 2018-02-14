@@ -8,34 +8,34 @@ def prepare_typed_query(type_names, term, from_date, to_date, search_size, offse
     search_fields = [sources[type_name].search_fields for type_name in type_names]
     search_fields = list(set().union(*search_fields))
     body = {
-        "query": {
-            "function_score": {
-                "query": {
-                    "multi_match": {
-                        "query": term,
-                        "fields": search_fields,
-                        "type": "best_fields",
-                        "operator": "and"
+        'query': {
+            'function_score': {
+                'query': {
+                    'multi_match': {
+                        'query': term,
+                        'fields': search_fields,
+                        'type': 'best_fields',
+                        'operator': 'and'
                     }
                 },
-                "boost_mode": "multiply",
-                "field_value_factor": {
-                        "field": "score",
-                        "modifier": "sqrt",
-                        "missing": 1
+                'boost_mode': 'multiply',
+                'field_value_factor': {
+                        'field': 'score',
+                        'modifier': 'sqrt',
+                        'missing': 1
                 }
             }
         },
-        "aggs": {
-            "type_totals": {
-                "terms": {"field": "_type"}
+        'aggs': {
+            'type_totals': {
+                'terms': {'field': '_type'}
             }
         },
-        "size": int(search_size),
-        "from": int(offset),
-        "highlight": {
-            "fields": {
-                "*": {}
+        'size': int(search_size),
+        'from': int(offset),
+        'highlight': {
+            'fields': {
+                '*': {}
             }
         }
     }
@@ -43,27 +43,27 @@ def prepare_typed_query(type_names, term, from_date, to_date, search_size, offse
     for ds in sources.values():
         for range_name, field_name in ds.date_fields.items():
             if range_name == 'year':
-                body["aggs"]["years_{}".format(ds.type_name)] = {"histogram": {"field": field_name, "interval": 1}}
+                body['aggs']['years_{}'.format(ds.type_name)] = {'histogram': {'field': field_name, 'interval': 1}}
             elif range_name == 'from':
-                body["aggs"]["months_{}".format(ds.type_name)] = {"date_histogram": {"field": field_name,
-                                                                                     "interval": "month",
-                                                                                     "min_doc_count": 1,
-                                                                                     "format": "yyyy-MM"}}
+                body['aggs']['months_{}'.format(ds.type_name)] = {'date_histogram': {'field': field_name,
+                                                                                     'interval': 'month',
+                                                                                     'min_doc_count': 1,
+                                                                                     'format': 'yyyy-MM'}}
 
     # if False:#ds.is_temporal:
-    #     body["aggs"]["stats_per_month"] = {
-    #         "date_histogram": {
-    #             "field": ds.date_fields['from'],
-    #             "interval": "month",
-    #             "min_doc_count": 1
+    #     body['aggs']['stats_per_month'] = {
+    #         'date_histogram': {
+    #             'field': ds.date_fields['from'],
+    #             'interval': 'month',
+    #             'min_doc_count': 1
     #         }
     #     }
     #     range_obj = ds.range_structure
-    #     range_obj[ds.date_fields['from']]["gte"] = from_date
-    #     range_obj[ds.date_fields['to']]["lte"] = to_date
-    #     bool_filter = body["aggs"]["filtered"]["filter"]["bool"]
-    #     bool_filter["must"] = [{
-    #         "range": range_obj
+    #     range_obj[ds.date_fields['from']]['gte'] = from_date
+    #     range_obj[ds.date_fields['to']]['lte'] = to_date
+    #     bool_filter = body['aggs']['filtered']['filter']['bool']
+    #     bool_filter['must'] = [{
+    #         'range': range_obj
     #     }]
     return body
 
@@ -134,9 +134,9 @@ def search(types, term, from_date, to_date, size, offset):
 
     for type_name in types:
         if type_name not in sources:
-            return {"message": "not a real type %s" % type_name}
+            return {'message': 'not a real type %s' % type_name}
     query = prepare_typed_query(types, term, from_date, to_date, size, offset)
-    results = get_es_client().search(index=INDEX_NAME, doc_type=",".join(types), body=query)
+    results = get_es_client().search(index=INDEX_NAME, doc_type=','.join(types), body=query)
     overalls = results['aggregations']['type_totals']['buckets']
     overalls = dict(
         (i['key'], i['doc_count'])
@@ -157,18 +157,19 @@ def search(types, term, from_date, to_date, size, offset):
 
     for agg_name, agg_data in results['aggregations'].items():
         range_name = None
-        if agg_name.startswith("years_"):
-            range_name = "year"
-        elif agg_name.startswith("months_"):
-            range_name = "month"
+        if agg_name.startswith('years_'):
+            range_name = 'year'
+        elif agg_name.startswith('months_'):
+            range_name = 'month'
         if range_name:
-            for bucket in agg_data["buckets"]:
-                bucket_key = bucket["key_as_string"] if range_name == "month" else int(bucket["key"])
-                if bucket_key:
-                    ds_search_counts = ret_val["search_counts"][agg_name.replace("{}s_".format(range_name), "")]
-                    ds_range_counts = ds_search_counts.setdefault("{}_counts".format(range_name), {})
+            for bucket in agg_data['buckets']:
+                bucket_key = bucket['key_as_string'] if range_name == 'month' else int(bucket['key'])
+                search_count_key = agg_name.replace('{}s_'.format(range_name), '')
+                if bucket_key and search_count_key in ret_val['search_counts']:
+                    ds_search_counts = ret_val['search_counts'][search_count_key]
+                    ds_range_counts = ds_search_counts.setdefault('{}_counts'.format(range_name), {})
                     ds_range_counts.setdefault(bucket_key, 0)
-                    ds_range_counts[bucket_key] += bucket["doc_count"]
+                    ds_range_counts[bucket_key] += bucket['doc_count']
 
     return ret_val
 
@@ -176,12 +177,12 @@ def search(types, term, from_date, to_date, size, offset):
 def autocomplete(term):
     es = get_es_client()
     query_body = {
-        "size": 10,
-        "query": {
-            "match": {
-                "_all": {
-                    "query": term,
-                    "operator": "and"
+        'size': 10,
+        'query': {
+            'match': {
+                '_all': {
+                    'query': term,
+                    'operator': 'and'
                 }
             }
         }
