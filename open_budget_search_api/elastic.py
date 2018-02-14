@@ -40,6 +40,16 @@ def prepare_typed_query(type_names, term, from_date, to_date, search_size, offse
         }
     }
 
+    for ds in sources.values():
+        for range_name, field_name in ds.date_fields.items():
+            if range_name == 'year':
+                body["aggs"]["years_{}".format(ds.type_name)] = {"histogram": {"field": field_name, "interval": 1}}
+            elif range_name == 'from':
+                body["aggs"]["months_{}".format(ds.type_name)] = {"date_histogram": {"field": field_name,
+                                                                                     "interval": "month",
+                                                                                     "min_doc_count": 1,
+                                                                                     "format": "yyyy-MM"}}
+
     # if False:#ds.is_temporal:
     #     body["aggs"]["stats_per_month"] = {
     #         "date_histogram": {
@@ -144,6 +154,21 @@ def search(types, term, from_date, to_date, size, offset):
             'type': hit['_type'].replace('-', ''),
             'score': hit['_score'],
         })
+
+    for agg_name, agg_data in results['aggregations'].items():
+        range_name = None
+        if agg_name.startswith("years_"):
+            range_name = "year"
+        elif agg_name.startswith("months_"):
+            range_name = "month"
+        if range_name:
+            for bucket in agg_data["buckets"]:
+                bucket_key = bucket["key_as_string"] if range_name == "month" else int(bucket["key"])
+                if bucket_key:
+                    ds_search_counts = ret_val["search_counts"][agg_name.replace("{}s_".format(range_name), "")]
+                    ds_range_counts = ds_search_counts.setdefault("{}_counts".format(range_name), {})
+                    ds_range_counts.setdefault(bucket_key, 0)
+                    ds_range_counts[bucket_key] += bucket["doc_count"]
 
     return ret_val
 
