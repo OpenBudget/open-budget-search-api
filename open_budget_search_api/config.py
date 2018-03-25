@@ -9,6 +9,8 @@ DEFAULT_TIMEOUT = 60
 
 DATAPACKAGE_BASE = 'http://next.obudget.org/datapackages/budgetkey/{}/datapackage.json'
 
+# browsable list of the datapackages is available here - http://next.obudget.org/datapackages/budgetkey/
+# each package has dpp:streamedFrom property which allows to identify the source pipeline in budgetkey-data-pipelines
 SEARCHABLE_DATAPACKAGES = [
     DATAPACKAGE_BASE.format(doc_type)
     for doc_type in [
