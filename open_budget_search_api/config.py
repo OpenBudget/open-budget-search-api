@@ -9,24 +9,18 @@ DEFAULT_TIMEOUT = 60
 
 DATAPACKAGE_BASE = 'http://next.obudget.org/datapackages/budgetkey/{}/datapackage.json'
 
+# browsable list of the datapackages is available here - http://next.obudget.org/datapackages/budgetkey/
+# each package has dpp:streamedFrom property which allows to identify the source pipeline in budgetkey-data-pipelines
 SEARCHABLE_DATAPACKAGES = [
     DATAPACKAGE_BASE.format(doc_type)
     for doc_type in [
-        # http://next.obudget.org/datapackages/people/aggregated/datapackage.json (people)
         'people',
-        # http://next.obudget.org/datapackages/procurement/tenders/processed/datapackage.json (tenders)
         'tenders',
-        # http://next.obudget.org/datapackages/entities/scored/datapackage.json (entities)
         'entities',
-        # http://next.obudget.org/datapackages/procurement/spending/latest-contract-spending/datapackage.json (contract-spending)
         'contract-spending',
-        # http://next.obudget.org/datapackages/budget/national/changes/full/datapackage.json (national-budget-changes)
         'national-budget-changes',
-        # http://next.obudget.org/datapackages/supports/by-request-year/datapackage.json (supports)
         'supports',
-        # http://next.obudget.org/datapackages/reports/all/datapackage.json (reports)
         'reports',
-        # http://next.obudget.org/datapackages/budget/national/processed/connected-items-explained/datapackage.json (budget)
         'budget'
     ]
 ]
