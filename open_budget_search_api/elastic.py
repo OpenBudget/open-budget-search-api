@@ -164,7 +164,7 @@ def search(types, term, from_date, to_date, size, offset):
         if range_name:
             for bucket in agg_data['buckets']:
                 bucket_key = bucket['key_as_string'] if range_name == 'month' else int(bucket['key'])
-                search_count_key = agg_name.replace('{}s_'.format(range_name), '')
+                search_count_key = agg_name.replace('{}s_'.format(range_name), '').replace('-', '')
                 if bucket_key and search_count_key in ret_val['search_counts']:
                     ds_search_counts = ret_val['search_counts'][search_count_key]
                     ds_range_counts = ds_search_counts.setdefault('{}_counts'.format(range_name), {})
