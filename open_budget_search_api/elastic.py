@@ -39,22 +39,20 @@ def prepare_base_query(type_names, term):
             }
         }
     }
-    for ds in sources.values():
-        if ds.date_fields.get('from') and ds.date_fields.get('to'):
-            body['aggs']['months_{}'.format(ds.type_name)] = {'date_histogram': {'field': ds.date_fields['from'],
-                                                                                 'interval': 'month',
-                                                                                 'min_doc_count': 1,
-                                                                                 'format': 'yyyy-MM'}}
-        elif ds.date_fields.get('year'):
-            body['aggs']['years_{}'.format(ds.type_name)] = {'histogram': {'field': ds.date_fields['year'], 'interval': 1}}
     return body
 
 
 def prepare_totals_query(body):
     body = deepcopy(body)
-    body.update({
-        'size': 0
-    })
+    body.update(size=0)
+    body['aggs']['type_totals']['aggs'] = {
+        'months': {
+            'terms': {
+                'field': '__date_range_months',
+                'size': 50
+            }
+        }
+    }
     return body
 
 
@@ -69,34 +67,10 @@ def prepare_search_query(body, from_date, to_date, search_size, offset):
             }
         }
     })
-    date_fields_query = {
-        'bool': {
-            'should': []
-        }
-    }
-
-    from_year, to_year = (d.split('-')[0] for d in (from_date, to_date))
-    body['query']['function_score']['query']['bool']['must'].append(date_fields_query)
-    for ds in sources.values():
-        if ds.date_fields.get('from') and ds.date_fields.get('to'):
-            date_fields_query['bool']['should'].append({
-                'bool': {
-                    'must': [
-                        {'type': {'value': ds.type_name}},
-                        {'range': {ds.date_fields['from']: {'gte': from_date},
-                                   ds.date_fields['to']: {'lte': to_date}}}
-                    ]
-                }
-            })
-        elif ds.date_fields.get('year'):
-            date_fields_query['bool']['should'].append({
-                'bool': {
-                    'must': [
-                        {'type': {'value': ds.type_name}},
-                        {'range': {ds.date_fields['year']: {'gte': from_year, 'lte': to_year}}}
-                    ]
-                }
-            })
+    body['query']['function_score']['query']['bool']['must'] += [
+        {'range': {'__date_range_from': {'lte': to_date}}},
+        {'range': {'__date_range_to': {'gte': from_date}}}
+    ]
     return body
 
 
@@ -195,21 +169,13 @@ def search(types, term, from_date, to_date, size, offset):
     totals_query = prepare_totals_query(base_query)
     total_results = get_es_client().search(index=INDEX_NAME, doc_type=','.join(types), body=totals_query)
 
-    for agg_name, agg_data in total_results['aggregations'].items():
-        range_name = None
-        if agg_name.startswith('years_'):
-            range_name = 'year'
-        elif agg_name.startswith('months_'):
-            range_name = 'month'
-        if range_name:
-            for bucket in agg_data['buckets']:
-                bucket_key = bucket['key_as_string'] if range_name == 'month' else int(bucket['key'])
-                search_count_key = agg_name.replace('{}s_'.format(range_name), '').replace('-', '')
-                if bucket_key and search_count_key in ret_val['search_counts']:
-                    ds_search_counts = ret_val['search_counts'][search_count_key]
-                    ds_range_counts = ds_search_counts.setdefault('{}_counts'.format(range_name), {})
-                    ds_range_counts.setdefault(bucket_key, 0)
-                    ds_range_counts[bucket_key] += bucket['doc_count']
+    for type_bucket in total_results['aggregations']['type_totals']['buckets']:
+        search_count_key = type_bucket['key'].replace('{}s_'.format('months'), '').replace('-', '')
+        for month_bucket in type_bucket['months']['buckets']:
+            ds_search_counts = ret_val['search_counts'][search_count_key]
+            ds_range_counts = ds_search_counts.setdefault('{}_counts'.format('months'), {})
+            ds_range_counts.setdefault(month_bucket['key'], 0)
+            ds_range_counts[month_bucket['key']] += month_bucket['doc_count']
 
     return ret_val
 
