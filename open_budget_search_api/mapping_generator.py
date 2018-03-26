@@ -63,11 +63,12 @@ class MappingGenerator(object):
         if converted_type is not None:
             prop['type'] = converted_type
         if converted_type == 'text':
-            search_field = prefix + field['name']
-            to_add = [search_field]
-            if 'es:title' in field or 'es:hebrew' in field:
-                to_add.append(search_field+'.hebrew^10')
-            search_fields.extend(to_add)
+            if field['name'] not in ['doc_id']:
+                search_field = prefix + field['name']
+                to_add = [search_field]
+                if 'es:title' in field or 'es:hebrew' in field:
+                    to_add.append(search_field+'.hebrew^10')
+                search_fields.extend(to_add)
         return field['name'], prop
 
     @classmethod
