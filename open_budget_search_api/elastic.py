@@ -74,8 +74,8 @@ def prepare_search_query(body, from_date, to_date, search_size, offset):
             'should': []
         }
     }
-    # TODO: extract year as integer from from_data and to_date
-    from_year, to_year = 2005, 2007
+
+    from_year, to_year = (d.split('-')[0] for d in (from_date, to_date))
     body['query']['function_score']['query']['bool']['must'].append(date_fields_query)
     for ds in sources.values():
         if ds.date_fields.get('from') and ds.date_fields.get('to'):
