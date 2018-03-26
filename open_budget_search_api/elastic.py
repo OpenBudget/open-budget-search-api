@@ -55,7 +55,6 @@ def prepare_totals_query(body):
     body.update({
         'size': 0
     })
-    import json; print(json.dumps(body, indent=2))
     return body
 
 
@@ -98,7 +97,6 @@ def prepare_search_query(body, from_date, to_date, search_size, offset):
                     ]
                 }
             })
-    import json; print(json.dumps(body, indent=2))
     return body
 
 
