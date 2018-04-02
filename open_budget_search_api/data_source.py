@@ -24,12 +24,7 @@ class DataSource(object):
         if isinstance(self.keys, str):
             self.keys = [self.keys]
 
-        self.date_fields = {}
         self.range_structure = {}
-
-        for field in fields:
-            if field.get("es:time-range"):
-                self.date_fields[field["es:time-range"]] = field["name"]
 
         try:
             self.scoring_column = next(iter(
