@@ -1,5 +1,6 @@
 open-budget-search-api
 ======================
+[![Build Status](https://travis-ci.org/OpenBudget/open-budget-search-api.svg?branch=master)](https://travis-ci.org/OpenBudget/open-budget-search-api)
 
 ### Setup Elasticsearch with data
 
