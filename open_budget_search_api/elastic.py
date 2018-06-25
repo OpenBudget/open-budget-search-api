@@ -18,7 +18,7 @@ def prepare_base_query(type_names, term):
                                 'multi_match': {
                                     'query': term,
                                     'fields': search_fields,
-                                    'type': 'best_fields',
+                                    'type': 'most_fields',
                                     'operator': 'and'
                                 }
                             }
@@ -40,6 +40,26 @@ def prepare_base_query(type_names, term):
         }
     }
     return body
+
+
+def apply_filters(query, filters):
+    must = query['query']['function_score']['query']['bool']['must']
+    for k, op, v in filters:
+        if op == 'eq':
+            must.append(dict(
+                term={
+                    k: v
+                }
+            ))
+        else:
+            must.append(dict(
+                range={
+                    k: {
+                        op: v
+                    }
+                }
+            ))
+    return query
 
 
 def prepare_totals_query(body):
@@ -131,7 +151,7 @@ def get_document(type_name, doc_id):
         return None
 
 
-def search(types, term, from_date, to_date, size, offset):
+def search(types, term, from_date, to_date, size, offset, filters):
     ret_val = {
         'search_counts': {},
         'search_results': [],
@@ -144,6 +164,7 @@ def search(types, term, from_date, to_date, size, offset):
             return {'message': 'not a real type %s' % type_name}
 
     base_query = prepare_base_query(types, term)
+    base_query = apply_filters(base_query, filters)
 
     search_query = prepare_search_query(base_query, from_date, to_date, size, offset)
     search_results = get_es_client().search(index=INDEX_NAME, doc_type=','.join(types), body=search_query)

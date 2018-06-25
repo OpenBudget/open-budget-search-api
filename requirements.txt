@@ -5,3 +5,5 @@ elasticsearch>=5.0.0,<6.0.0
 flask_jsonpify
 psycopg2
 datapackage
+demjson
+
