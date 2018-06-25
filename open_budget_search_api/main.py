@@ -28,7 +28,7 @@ def fetch_filters(filters):
                 ret.append((k, 'eq', v))
         return ret
     except Exception:
-        raise 'Failed to parse filters {:r}'.format(filters)
+        raise 'Failed to parse filters {!r}'.format(filters)
 
 
 @app.route('/search/<string:types>/<string:search_term>/'

@@ -5,7 +5,6 @@ import elasticsearch
 
 from .data_sources import sources
 from .config import INDEX_NAME, get_es_client
-from .logger import logger
 
 
 def prepare_base_query(type_names, term):
@@ -62,8 +61,6 @@ def apply_filters(query, filters):
                     }
                 }
             ))
-    if len(filters):
-        logger.info('QUERYING WITH FILTERS\n%s', demjson.encode(query, compactly=False))
     return query
 
 
