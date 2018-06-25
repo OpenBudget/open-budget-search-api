@@ -67,10 +67,11 @@ def prepare_search_query(body, from_date, to_date, search_size, offset):
             }
         }
     })
-    body['query']['function_score']['query']['bool']['must'] += [
-        {'range': {'__date_range_from': {'lte': to_date}}},
-        {'range': {'__date_range_to': {'gte': from_date}}}
-    ]
+    if None not in (from_date, to_date):
+        body['query']['function_score']['query']['bool']['must'] += [
+            {'range': {'__date_range_from': {'lte': to_date}}},
+            {'range': {'__date_range_to': {'gte': from_date}}}
+        ]
     return body
 
 
@@ -154,7 +155,7 @@ def search(types, term, from_date, to_date, size, offset):
     )
 
     for type_name in types:
-        ret_val['search_counts'][type_name.replace('-', '')] = {
+        ret_val['search_counts'][type_name] = {
             'total_overall': overalls.get(type_name, 0),
         }
 
@@ -162,7 +163,7 @@ def search(types, term, from_date, to_date, size, offset):
         ret_val['search_results'].append({
             'source': merge_highlight_into_source(hit['_source'], hit['highlight']),
             'highlight': {},
-            'type': hit['_type'].replace('-', ''),
+            'type': hit['_type'],
             'score': hit['_score'],
         })
 
@@ -170,28 +171,11 @@ def search(types, term, from_date, to_date, size, offset):
     total_results = get_es_client().search(index=INDEX_NAME, doc_type=','.join(types), body=totals_query)
 
     for type_bucket in total_results['aggregations']['type_totals']['buckets']:
-        search_count_key = type_bucket['key'].replace('{}s_'.format('months'), '').replace('-', '')
+        search_count_key = type_bucket['key'].replace('months_', '')
         for month_bucket in type_bucket['months']['buckets']:
             ds_search_counts = ret_val['search_counts'][search_count_key]
-            ds_range_counts = ds_search_counts.setdefault('{}_counts'.format('months'), {})
+            ds_range_counts = ds_search_counts.setdefault('months_counts', {})
             ds_range_counts.setdefault(month_bucket['key'], 0)
             ds_range_counts[month_bucket['key']] += month_bucket['doc_count']
 
     return ret_val
-
-
-def autocomplete(term):
-    es = get_es_client()
-    query_body = {
-        'size': 10,
-        'query': {
-            'match': {
-                '_all': {
-                    'query': term,
-                    'operator': 'and'
-                }
-            }
-        }
-    }
-    elastic_result = es.search(body=query_body)
-    return elastic_result

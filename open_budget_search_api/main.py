@@ -25,6 +25,18 @@ def search_handler(types, search_term, from_date, to_date, size, offset):
     return jsonpify(result)
 
 
+@app.route('/search/<string:types>/<string:search_term>',
+           methods=['GET'])
+def simple_search_handler(types, search_term):
+    types_formatted = str(types).split(",")
+    try:
+        result = search(types_formatted, search_term, None, None, 100, 0)
+    except Exception as e:
+        logger.exception("Error searching %s for tables: %s " % (search_term, str(types)))
+        result = {'error': str(e)}
+    return jsonpify(result)
+
+
 @app.route('/get/<path:doc_id>',
            methods=['GET'])
 def get_document_handler(doc_id):
