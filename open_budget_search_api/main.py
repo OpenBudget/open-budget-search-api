@@ -1,5 +1,4 @@
 import demjson
-import logging
 
 from flask import Flask, request
 from flask.helpers import NotFound
@@ -66,7 +65,7 @@ def simple_search_handler(types, search_term):
 def get_document_handler(doc_id):
     result = get_document('document', doc_id)
     if result is None:
-        logging.warning('Failed to fetch document for %r', doc_id)
+        logger.warning('Failed to fetch document for %r', doc_id)
         raise NotFound()
     return jsonpify(result)
 
