@@ -1,4 +1,3 @@
-import demjson
 from copy import deepcopy
 
 import elasticsearch

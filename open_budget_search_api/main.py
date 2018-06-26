@@ -38,8 +38,7 @@ def fetch_filters(filters):
 def search_handler(types, search_term, from_date, to_date, size, offset):
     try:
         types_formatted = str(types).split(",")
-        # filters = fetch_filters(request.values.get('filter'))
-        filters = []
+        filters = fetch_filters(request.values.get('filter'))
         result = search(types_formatted, search_term, from_date, to_date, size, offset, filters)
     except Exception as e:
         logger.exception("Error searching %s for tables: %s " % (search_term, str(types)))
