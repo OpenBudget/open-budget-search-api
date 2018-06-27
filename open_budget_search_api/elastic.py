@@ -88,11 +88,18 @@ class Query():
                     }
                 ))
             else:
-                must.append(dict(
-                    term={
-                        k: v
-                    }
-                ))
+                if isinstance(v, list):
+                    must.append(dict(
+                        terms={
+                            k: v
+                        }
+                    ))
+                else:
+                    must.append(dict(
+                        term={
+                            k: v
+                        }
+                    ))
         return self
 
     def apply_time_range(self, from_date, to_date):
