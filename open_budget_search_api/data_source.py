@@ -1,6 +1,5 @@
 from datapackage import DataPackage
 
-from .config import INDEX_NAME
 from .logger import logger
 from .mapping_generator import MappingGenerator
 

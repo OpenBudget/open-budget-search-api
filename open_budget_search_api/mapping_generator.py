@@ -18,12 +18,12 @@ class MappingGenerator(object):
         if enabled and schema_type == 'object':
             subschema = field['es:schema']
         converted_type, _ = {
-            "integer": ("long",{}),
-            "number": ("scaled_float",{}),
+            "integer": ("long", {}),
+            "number": ("scaled_float", {}),
             "string": ("text", {}),
             "boolean": ("boolean", {}),
-            "date": ("date",{}),
-            "datetime": ("date",{}),
+            "date": ("date", {}),
+            "datetime": ("date", {}),
             "object": (None,
                        {"properties":
                            cls._update_properties(subschema, search_fields, prefix + field['name'] + '.')

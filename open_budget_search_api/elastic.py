@@ -1,5 +1,4 @@
 import demjson
-from copy import deepcopy
 
 import elasticsearch
 
@@ -7,7 +6,8 @@ from .data_sources import sources
 from .config import INDEX_NAME, get_es_client
 from .logger import logger
 
-#### QUERY DSL HANDLING
+
+# ### QUERY DSL HANDLING
 class Query():
 
     def __init__(self, types):
@@ -16,8 +16,8 @@ class Query():
 
     def run(self, ):
         return get_es_client()\
-                .search(index=INDEX_NAME, 
-                        doc_type=','.join(self.types), 
+                .search(index=INDEX_NAME,
+                        doc_type=','.join(self.types),
                         body=self.q)
 
     def must(self):
@@ -128,97 +128,7 @@ class Query():
         return self
 
 
-# def prepare_base_query(type_names, term):
-#     search_fields = [sources[type_name].search_fields for type_name in type_names]
-#     search_fields = list(set().union(*search_fields))
-#     body = {
-#         'query': {
-#             'function_score': {
-#                 'query': {
-#                     'bool': {
-#                         'must': [
-#                             {
-#                                 'multi_match': {
-#                                     'query': term,
-#                                     'fields': search_fields,
-#                                     'type': 'most_fields',
-#                                     'operator': 'and'
-#                                 }
-#                             }
-#                         ]
-#                     }
-#                 },
-#                 'boost_mode': 'multiply',
-#                 'field_value_factor': {
-#                         'field': 'score',
-#                         'modifier': 'sqrt',
-#                         'missing': 1
-#                 }
-#             }
-#         },
-#         'aggs': {
-#             'type_totals': {
-#                 'terms': {'field': '_type'}
-#             }
-#         }
-#     }
-#     return body
-
-
-# def apply_filters(query, filters):
-#     must = query['query']['function_score']['query']['bool']['must']
-#     for k, op, v in filters:
-#         if op == 'eq':
-#             must.append(dict(
-#                 term={
-#                     k: v
-#                 }
-#             ))
-#         else:
-#             must.append(dict(
-#                 range={
-#                     k: {
-#                         op: v
-#                     }
-#                 }
-#             ))
-#     return query
-
-
-# def prepare_totals_query(body):
-#     body = deepcopy(body)
-#     body.update(size=0)
-#     body['aggs']['type_totals']['aggs'] = {
-#         'months': {
-#             'terms': {
-#                 'field': '__date_range_months',
-#                 'size': 50
-#             }
-#         }
-#     }
-#     return body
-
-
-# def prepare_search_query(body, from_date, to_date, search_size, offset):
-#     body = deepcopy(body)
-#     body.update({
-#         'size': int(search_size),
-#         'from': int(offset),
-#         'highlight': {
-#             'fields': {
-#                 '*': {}
-#             }
-#         }
-#     })
-#     if None not in (from_date, to_date):
-#         body['query']['function_score']['query']['bool']['must'] += [
-#             {'range': {'__date_range_from': {'lte': to_date}}},
-#             {'range': {'__date_range_to': {'gte': from_date}}}
-#         ]
-#     return body
-
-#### HIGHLIGHT HANDLING
-
+# ### HIGHLIGHT HANDLING
 def prepare_replacements(highlighted):
     return [
         (h.replace('<em>', '').replace('</em>', ''), h)
@@ -265,8 +175,8 @@ def merge_highlight_into_source(source, highlights):
         src[field] = do_replacements(src[field], highlighted)
     return source
 
-#### UTILS
 
+# ### UTILS
 def validate_types(types):
     if 'all' in types:
         types = sources().keys()
@@ -276,20 +186,19 @@ def validate_types(types):
             raise ValueError('not a real type %s' % type_name)
     return types
 
-#### Main API
 
+# ### Main API
 def search(types, term, from_date, to_date, size, offset, filters):
     types = validate_types(types)
 
-    query_results = \
-        Query(types)\
-            .apply_term(term)\
-            .apply_filters(filters)\
-            .apply_pagination(size, offset)\
-            .apply_scoring()\
-            .apply_highlighting()\
-            .apply_time_range(from_date, to_date)\
-            .run()
+    query_results = Query(types)\
+        .apply_term(term)\
+        .apply_filters(filters)\
+        .apply_pagination(size, offset)\
+        .apply_scoring()\
+        .apply_highlighting()\
+        .apply_time_range(from_date, to_date)\
+        .run()
 
     search_results = [
         dict(
@@ -319,23 +228,23 @@ def count(term, from_date, to_date, config):
             .apply_time_range(from_date, to_date)\
             .run()
         counts[id] = dict(
-            total_overall=query_results['hits']['total'] 
-        ) # TODO
+            total_overall=query_results['hits']['total']
+        )
     return dict(
         search_counts=counts
     )
 
+
 def timeline(types, term, from_date, to_date, filters):
     types = validate_types(types)
 
-    query_results = \
-        Query(types)\
-            .apply_term(term)\
-            .apply_filters(filters)\
-            .apply_pagination(0, 0)\
-            .apply_time_range(from_date, to_date)\
-            .apply_month_aggregates()\
-            .run()
+    query_results = Query(types)\
+        .apply_term(term)\
+        .apply_filters(filters)\
+        .apply_pagination(0, 0)\
+        .apply_time_range(from_date, to_date)\
+        .apply_month_aggregates()\
+        .run()
 
     timeline = query_results.get('aggregations', {}).get('timeline', {}).get('buckets', [])
     timeline = ((b['key'], b['doc_count'])
@@ -350,28 +259,6 @@ def timeline(types, term, from_date, to_date, filters):
     return dict(
         timeline=timeline
     )
-
-    # overalls = search_results['aggregations']['type_totals']['buckets']
-    # overalls = dict(
-    #     (i['key'], i['doc_count'])
-    #     for i in overalls
-    # )
-
-    # for type_name in types:
-    #     ret_val['search_counts'][type_name] = {
-    #         'total_overall': overalls.get(type_name, 0),
-    #     }
-        
-    # totals_query = prepare_totals_query(base_query)
-    # total_results = get_es_client().search(index=INDEX_NAME, doc_type=','.join(types), body=totals_query)
-
-    # for type_bucket in total_results['aggregations']['type_totals']['buckets']:
-    #     search_count_key = type_bucket['key'].replace('months_', '')
-    #     for month_bucket in type_bucket['months']['buckets']:
-    #         ds_search_counts = ret_val['search_counts'][search_count_key]
-    #         ds_range_counts = ds_search_counts.setdefault('months_counts', {})
-    #         ds_range_counts.setdefault(month_bucket['key'], 0)
-    #         ds_range_counts[month_bucket['key']] += month_bucket['doc_count']
 
 
 def get_document(type_name, doc_id):
