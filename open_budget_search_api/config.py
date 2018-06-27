@@ -24,9 +24,7 @@ SEARCHABLE_DATAPACKAGES = [
         'budget'
     ]
 ]
-NON_SEARCHABLE_DATAPACKAGES = [
-    'http://next.obudget.org/datapackages/budgetkey/documents/datapackage.json',
-]
+
 
 _es = None
 

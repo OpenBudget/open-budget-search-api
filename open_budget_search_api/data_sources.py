@@ -1,20 +1,23 @@
-from .config import SEARCHABLE_DATAPACKAGES, NON_SEARCHABLE_DATAPACKAGES
+import json
+
+from .config import SEARCHABLE_DATAPACKAGES
 from .data_source import DataSource
 
-searchable_sources = [
-    DataSource(url) for url in SEARCHABLE_DATAPACKAGES
-]
-non_searchable_sources = [
-    DataSource(url) for url in NON_SEARCHABLE_DATAPACKAGES
-]
+_sources = None
 
 
-sources = dict(
-    (ds.type_name, ds) for ds in searchable_sources
-)
+def sources():
+    global _sources
+    if _sources is None:
+        try:
+            _sources = json.load(open('source_config.json'))
+        except Exception:
+            searchable_sources = [
+                DataSource(url) for url in SEARCHABLE_DATAPACKAGES
+            ]
 
-
-all_sources = non_searchable_sources + searchable_sources
-all_sources = dict(
-    (ds.type_name, ds) for ds in all_sources
-)
+            _sources = dict(
+                (ds.type_name, ds.search_fields) for ds in searchable_sources
+            )
+            json.dump(_sources, open('source_config.json', 'w'))
+    return _sources
