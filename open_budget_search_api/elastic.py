@@ -80,6 +80,7 @@ class Query():
             parts = k.split('__')
             if len(parts) > 1 and parts[-1] in ('gt', 'gte', 'lt', 'lte', 'eq'):
                 op = parts[-1]
+                k = '__'.join(parts[:-1])
                 must.append(dict(
                     range={
                         k: {
