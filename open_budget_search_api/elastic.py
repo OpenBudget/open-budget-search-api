@@ -27,6 +27,13 @@ class Query():
                      .setdefault('bool', {})\
                      .setdefault('must', [])
 
+    def must_not(self):
+        return self.q.setdefault('query', {})\
+                     .setdefault('function_score', {})\
+                     .setdefault('query', {})\
+                     .setdefault('bool', {})\
+                     .setdefault('must_not', [])
+
     def apply_term(self, term):
         search_fields = [sources()[type_name] for type_name in self.types]
         search_fields = list(set().union(*search_fields))
@@ -69,18 +76,25 @@ class Query():
         if not filters:
             return self
 
-        must = self.must()
-
         if isinstance(filters, str):
             if not filters.startswith('{'):
                 filters = '{' + filters + '}'
             filters = demjson.decode(filters)
 
         for k, v in filters.items():
+            must = self.must()
             parts = k.split('__')
-            if len(parts) > 1 and parts[-1] in ('gt', 'gte', 'lt', 'lte', 'eq'):
+            op = None
+
+            if len(parts) > 1 and parts[-1] in ('gt', 'gte', 'lt', 'lte', 'eq', 'not'):
                 op = parts[-1]
                 k = '__'.join(parts[:-1])
+
+            if op == 'not':
+                must = self.must_not()
+                op = None
+
+            if op is not None:
                 must.append(dict(
                     range={
                         k: {
