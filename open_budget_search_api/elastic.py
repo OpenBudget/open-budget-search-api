@@ -151,6 +151,16 @@ class Query():
 
 
 # ### HIGHLIGHT HANDLING
+DONT_HIGHLIGHT = {
+    'kind',
+    'kind_he',
+    'budget_code',
+    'entity_kind',
+    'entity_id',
+    'code',
+}
+
+
 def prepare_replacements(highlighted):
     return [
         (h.replace('<em>', '').replace('</em>', ''), h)
@@ -182,6 +192,8 @@ def do_replacements(value, replacements):
 
 def merge_highlight_into_source(source, highlights):
     for field, highlighted in highlights.items():
+        if field in DONT_HIGHLIGHT:
+            continue
         highlighted = prepare_replacements(highlighted)
         field_parts = field.split('.')
         src = source
