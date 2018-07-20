@@ -24,5 +24,5 @@ def sources():
             _sources = dict(
                 (ds.type_name, ds.search_fields) for ds in searchable_sources
             )
-            json.dump(_sources, open('source_config.json', 'w'))
+            # json.dump(_sources, open('source_config.json', 'w'))
     return _sources
