@@ -244,6 +244,11 @@ def search(types, term, from_date, to_date, size, offset, filters):
     ]
 
     return dict(
+        search_counts=dict(
+            _current=dict(
+                total_overall=query_results['hits']['total']
+            )
+        ),
         search_results=search_results
     )
 
