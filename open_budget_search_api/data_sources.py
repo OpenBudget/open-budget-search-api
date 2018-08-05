@@ -12,7 +12,7 @@ def sources():
     global _sources
     if _sources is None:
         try:
-            _sources = json.load(open('source_config.json'))
+            _sources = json.load(open('/tmp/source_config.json'))
         except Exception:
             searchable_sources = []
             for url in SEARCHABLE_DATAPACKAGES:
@@ -24,5 +24,5 @@ def sources():
             _sources = dict(
                 (ds.type_name, ds.search_fields) for ds in searchable_sources
             )
-            # json.dump(_sources, open('source_config.json', 'w'))
+            json.dump(_sources, open('/tmp/source_config.json', 'w'))
     return _sources
