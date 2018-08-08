@@ -41,7 +41,7 @@ class Query():
             multi_match=dict(
                 query=term,
                 fields=search_fields,
-                type='best_fields',
+                type='most_fields',
                 operator='and'
             )
         ))
