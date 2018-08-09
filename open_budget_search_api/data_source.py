@@ -18,6 +18,7 @@ class DataSource(object):
         self._mapping_generator = MappingGenerator()
         try:
             self.search_fields = self.build_mapping(self._schema)
+            logger.error('SEARCH FIELDS for %s: %r', dp_url, sorted(self.search_fields))
         except Exception:
             logger.exception('Failed to load %s', dp_url)
             raise

@@ -4,7 +4,6 @@ import elasticsearch
 
 from .data_sources import sources
 from .config import INDEX_NAME, get_es_client
-from .logger import logger
 
 
 # ### QUERY DSL HANDLING
@@ -293,7 +292,6 @@ def timeline(types, term, from_date, to_date, filters):
         timeline = filter(lambda k: k[0] >= from_date[:7] and k[0] <= to_date[:7],
                           timeline)
     timeline = sorted(timeline)
-    logger.error('%d %r %r', len(timeline), timeline[:10], timeline[-10:])
 
     return dict(
         timeline=timeline
