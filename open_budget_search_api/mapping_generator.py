@@ -32,9 +32,15 @@ class MappingGenerator(object):
         if converted_type == 'text':
             if field['name'] not in ('doc_id',):
                 search_field = prefix + field['name']
-                to_add = [search_field]
+                to_add = []
                 if 'es:title' in field or 'es:hebrew' in field:
-                    to_add.append(search_field+'.hebrew^10')
+                    if 'es:keyword' in field:
+                        to_add.append(search_field+'^10')
+                    else:
+                        to_add.append(search_field+'^3')
+                        to_add.append(search_field+'.hebrew^10')
+                else:
+                    to_add.append(search_field)
                 search_fields.extend(to_add)
 
     @classmethod
