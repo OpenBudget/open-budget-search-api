@@ -21,7 +21,8 @@ SEARCHABLE_DATAPACKAGES = [
         'national-budget-changes',
         'supports',
         'reports',
-        'budget'
+        'budget',
+        'gov_decisions',
     ]
 ]
 
