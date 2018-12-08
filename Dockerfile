@@ -2,18 +2,14 @@ FROM codexfons/gunicorn
 
 USER root
 
-RUN apk add --update --virtual=build-dependencies wget ca-certificates python3-dev postgresql-dev libxml2-dev libxslt-dev build-base
-RUN apk add --update libpq libxml2 libxslt libstdc++
-RUN python3 --version
+RUN apk add --update --no-cache --virtual=build-dependencies wget ca-certificates python3-dev postgresql-dev libxml2-dev libxslt-dev build-base
+RUN apk add --update --no-cache libpq libxml2 libxslt libstdc++
 
-COPY requirements.txt /requirements.txt
-RUN pip3 install -r /requirements.txt
+
+COPY . $APP_PATH/
+RUN pip3 install $APP_PATH
 
 RUN apk del build-dependencies
-RUN rm -rf /var/cache/apk/*
-
-COPY [a-z_A-Z]* $APP_PATH/
-COPY open_budget_search_api/ $APP_PATH/open_budget_search_api/
 
 USER $GUNICORN_USER
 

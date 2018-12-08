@@ -21,7 +21,6 @@ def read(*paths):
 # Prepare
 PACKAGE = 'open_budget_search_api'
 NAME = PACKAGE.replace('_', '-')
-INSTALL_REQUIRES = read('requirements.txt').split('\n')
 TESTS_REQUIRE = [
     'pylama',
     'tox',
@@ -37,7 +36,9 @@ setup(
     version=VERSION,
     packages=PACKAGES,
     include_package_data=True,
-    install_requires=INSTALL_REQUIRES,
+    install_requires=[
+        'apies>=0.0.2'
+    ],
     tests_require=TESTS_REQUIRE,
     extras_require={'develop': TESTS_REQUIRE},
     zip_safe=False,
