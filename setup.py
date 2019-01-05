@@ -37,7 +37,7 @@ setup(
     packages=PACKAGES,
     include_package_data=True,
     install_requires=[
-        'apies>=0.0.7'
+        'apies>=0.0.8'
     ],
     tests_require=TESTS_REQUIRE,
     extras_require={'develop': TESTS_REQUIRE},
