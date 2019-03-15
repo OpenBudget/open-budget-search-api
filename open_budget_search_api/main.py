@@ -27,6 +27,7 @@ blueprint = apies_blueprint(app,
             'reports',
             'budget',
             'gov_decisions',
+            'calls_for_bids',
         ]
     ],
     elasticsearch.Elasticsearch([dict(host=ES_HOST, port=ES_PORT)], timeout=60),
