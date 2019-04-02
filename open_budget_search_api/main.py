@@ -36,6 +36,7 @@ blueprint = apies_blueprint(app,
     dont_highlight={
         'kind',
         'kind_he',
+        'tender_type_he',
         'budget_code',
         'entity_kind',
         'entity_id',
