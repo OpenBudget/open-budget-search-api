@@ -41,6 +41,8 @@ blueprint = apies_blueprint(app,
         'entity_kind',
         'entity_id',
         'code',
+        'decision',
+        'simple_decision',
     },
 )
 app.register_blueprint(blueprint, url_prefix='/')
