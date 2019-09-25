@@ -14,6 +14,25 @@ INDEX_NAME = os.environ.get('INDEX_NAME', 'budgetkey')
 
 app = Flask(__name__)
 CORS(app)
+
+
+def text_rules(field):
+    if field.get('es:title') or field.get('es:hebrew'):
+        if field.get('es:keyword'):
+            return [('exact', '^10')]
+        else:
+            return [('inexact', '^3'), ('natural', '.hebrew^10')]
+    elif field.get('es:boost'):
+        if field.get('es:keyword'):
+            return [('exact', '^10')]
+        else:
+            return [('inexact', '^10')]
+    elif field.get('es:keyword'):
+        return [('exact', '')]
+    else:
+        return [('inexact', '')]
+
+
 blueprint = apies_blueprint(app,
     [
         DATAPACKAGE_BASE.format(doctype)
@@ -44,6 +63,7 @@ blueprint = apies_blueprint(app,
         'decision',
         'simple_decision',
     },
+    text_field_rules=text_rules,
     debug_queries=True
 )
 app.register_blueprint(blueprint, url_prefix='/')
