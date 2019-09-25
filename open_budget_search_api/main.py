@@ -64,7 +64,7 @@ blueprint = apies_blueprint(app,
         'simple_decision',
     },
     text_field_rules=text_rules,
-    debug_queries=True
+    debug_queries=False
 )
 app.register_blueprint(blueprint, url_prefix='/')
 
