@@ -33,10 +33,7 @@ def text_rules(field):
         return [('inexact', '')]
 
 
-blueprint = apies_blueprint(app,
-    [
-        DATAPACKAGE_BASE.format(doctype)
-        for doctype in [
+TYPES = [
             'people',
             'tenders',
             'entities',
@@ -49,9 +46,18 @@ blueprint = apies_blueprint(app,
             'calls_for_bids',
             'support_criteria',
         ]
+
+
+blueprint = apies_blueprint(app,
+    [
+        DATAPACKAGE_BASE.format(doctype)
+        for doctype in TYPES
     ],
     elasticsearch.Elasticsearch([dict(host=ES_HOST, port=ES_PORT)], timeout=60),
-    'budgetkey',
+    dict(
+        (t, f'{INDEX_NAME}__{t}')
+        for t in TYPES
+    ),
     dont_highlight={
         'kind',
         'kind_he',
@@ -63,6 +69,8 @@ blueprint = apies_blueprint(app,
         'decision',
         'simple_decision',
     },
+    multi_match_type='best_fields',
+    multi_match_operator='and',
     text_field_rules=text_rules,
     debug_queries=False
 )
