@@ -58,6 +58,7 @@ blueprint = apies_blueprint(app,
         (t, f'{INDEX_NAME}__{t}')
         for t in TYPES
     ),
+    f'{INDEX_NAME}__docs',
     dont_highlight={
         'kind',
         'kind_he',
