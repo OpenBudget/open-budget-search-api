@@ -19,7 +19,8 @@ env:
     - DEPLOY_YAML_UPDATE_FILE=values.auto-updated.yaml
     - DEPLOY_VALUES_CHART_NAME=search-api
     - DEPLOY_VALUES_IMAGE_PROP=image
-    - DEPLOY_COMMIT_MESSAGE="automatic update of open-budget-search-api"
+    # - DEPLOY_COMMIT_MESSAGE="automatic update of open-budget-search-api"
+    - DEPLOY_COMMIT_MESSAGE="temp update"
     - DEPLOY_GIT_EMAIL=budgetkey-deployer@null.void
     - DEPLOY_GIT_USER=budgetkey-deployer
     - secure: jWcURCkq+Bx+ROkPAcqRA2NV04+I3Egs2hRqIvmE/2JnKlKB7D/Arm3Op+FIchS3qPm0Xq2ZGVHS1lQjVykvLGo4nT8bZpoBvfuGoTR3GhuRE2qnil9eauYplYUxG8K1T3C1zcBR9l2R2OQQbg6tO5xcXsq0pyXIkI63nMUcZiU9GdnfEjsJnLx/dotXXQD9UGStQWOH4hIj/U2PrPSxWkmq6tYSTpLCAfBvzsvbJ5c9zlL1v75NVHGrqsGNc0x33DDZz1jnKWRk7fpwsnnEWlfozgB1REvK3uO3X/R0ZCurnFrrp6XdIMFBVG16Phr8hD/JeoSkN0zL4x78JafJYHjc+TObZER7AUjgUKtxu/yTQ+9Q1kw4B2Dz6ftLd37GkRhlW9PwpXNGqQ/d1iEQzDJWJvvLXSG06V335OYzaa3Zmnu3fkm55TPFQ/VSZKp1gadIhMGC9wo+Z78bqgo+JMlZvNng4jJPO+Y+SSRi1kgys87aApfzglZFQZrgo6HEqLCFH/8FAX0wa4l9US4nyj1ruP8i9uzNAAqGgaPSPPgtr294z402K6m5HCUDO3AIR1IHpB0kcPRsVh8yNloDRwZ1o4kARCjDlDJVFodn+U2irE6xqMzDCP/KoqxCLIZsF6nE6ZE1Ruc3tNIImsMliuyWSvrz7GHBSGuduvrCnHY=
