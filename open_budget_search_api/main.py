@@ -21,7 +21,7 @@ def text_rules(field):
         if field.get('es:keyword'):
             return [('exact', '^10')]
         else:
-            return [('inexact', '^3'), ('natural', '.hebrew^10')]
+            return [('inexact', '^10'), ('natural', '.hebrew^3')]
     elif field.get('es:hebrew'):
         return [('inexact', ''), ('natural', '.hebrew')]
     elif field.get('es:boost'):
