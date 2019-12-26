@@ -17,11 +17,13 @@ CORS(app)
 
 
 def text_rules(field):
-    if field.get('es:title') or field.get('es:hebrew'):
+    if field.get('es:title'):
         if field.get('es:keyword'):
             return [('exact', '^10')]
         else:
             return [('inexact', '^3'), ('natural', '.hebrew^10')]
+    elif field.get('es:hebrew'):
+        return [('inexact', ''), ('natural', '.hebrew')]
     elif field.get('es:boost'):
         if field.get('es:keyword'):
             return [('exact', '^10')]
