@@ -47,6 +47,7 @@ TYPES = [
             'gov_decisions',
             'calls_for_bids',
             'support_criteria',
+            'activities',
         ]
 
 
