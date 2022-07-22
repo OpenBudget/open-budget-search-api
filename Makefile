@@ -8,6 +8,7 @@ VERSION := $(shell head -n 1 $(PACKAGE)/VERSION)
 all: list
 
 install:
+	pip install --upgrade pip
 	pip install --upgrade -e .[develop]
 
 list:
