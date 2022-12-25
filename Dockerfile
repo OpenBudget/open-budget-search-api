@@ -1,18 +1,24 @@
-FROM codexfons/gunicorn
+FROM python:3.10-slim
 
-USER root
+ENV GUNICORN_PORT=8000
+ENV GUNICORN_MODULE=open_budget_search_api.main
+ENV GUNICORN_CALLABLE=app
+ENV GUNICORN_USER=gunicorn
+ENV APP_PATH=/opt/app
 
-RUN apk add --update --no-cache --virtual=build-dependencies wget ca-certificates python3-dev postgresql-dev libxml2-dev libxslt-dev build-base
-RUN apk add --update --no-cache libpq libxml2 libxslt libstdc++
+RUN apt-get update && apt-get install --no-install-recommends -y wget && update-ca-certificates
 
+# Install dependencies and create runtime user.
+RUN pip3 install --upgrade pip gunicorn[gevent] \
+    && adduser --disabled-password --home $APP_PATH $GUNICORN_USER
 
-COPY . $APP_PATH/
-RUN pip3 install $APP_PATH
+ADD . $APP_PATH
 
-RUN apk del build-dependencies
+RUN cd $APP_PATH \
+    && pip3 install $APP_PATH
 
 USER $GUNICORN_USER
 
-ENV GUNICORN_MODULE=open_budget_search_api.main
-
 EXPOSE 8000
+
+CMD cd $APP_PATH && gunicorn -t 120 --bind 0.0.0.0:$GUNICORN_PORT -k gevent -w 8 --limit-request-line 0 --log-level debug --access-logfile - $GUNICORN_MODULE:$GUNICORN_CALLABLE
