@@ -49,6 +49,7 @@ TYPES = [
             'support_criteria',
             'activities',
             'muni_budgets',
+            'muni_tenders',
         ]
 
 
