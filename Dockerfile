@@ -15,7 +15,7 @@ RUN pip3 install --upgrade pip gunicorn[gevent] \
 ADD . $APP_PATH
 
 RUN cd $APP_PATH \
-    && pip3 install $APP_PATH
+    && pip3 install -r requirements.txt && pip3 install $APP_PATH
 
 USER $GUNICORN_USER
 
