@@ -51,6 +51,13 @@ TYPES = [
             'muni_budgets',
             'muni_tenders',
         ]
+EXCEPTIONS = {
+    'contract-spending': '20191226180556919439_33d16b3f',
+}
+EXCEPTION_TYPES = [
+    ('_' + EXCEPTIONS[t]) if t in EXCEPTIONS else ''
+    for t in TYPES
+]
 
 
 blueprint = apies_blueprint(app,
@@ -60,8 +67,8 @@ blueprint = apies_blueprint(app,
     ],
     elasticsearch.Elasticsearch([dict(host=ES_HOST, port=ES_PORT)], timeout=60),
     dict(
-        (t, f'{INDEX_NAME}__{t}')
-        for t in TYPES
+        (t, f'{INDEX_NAME}__{t}{e}')
+        for t,e in zip(TYPES, EXCEPTION_TYPES)
     ),
     f'{INDEX_NAME}__docs',
     dont_highlight={
