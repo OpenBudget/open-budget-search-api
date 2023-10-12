@@ -52,7 +52,7 @@ TYPES = [
             'muni_tenders',
         ]
 EXCEPTIONS = {
-    'contract-spending': '20191226180556919439_33d16b3f',
+    # 'contract-spending': '20191226180556919439_33d16b3f',
 }
 EXCEPTION_TYPES = [
     ('_' + EXCEPTIONS[t]) if t in EXCEPTIONS else ''
